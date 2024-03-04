@@ -1,0 +1,4 @@
+# Auto detect text files and perform LFS normalization
+* text = auto
+
+Content/Assets/** filter=lfs diff=lfs merge=lfs -text
