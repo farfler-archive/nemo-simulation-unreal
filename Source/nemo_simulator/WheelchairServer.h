@@ -41,5 +41,6 @@ private:
 	bool bShouldListen = true;
 
 	void Listen();
+	bool CheckConnection();
 		
 };

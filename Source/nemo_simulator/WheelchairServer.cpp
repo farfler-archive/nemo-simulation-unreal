@@ -30,11 +30,13 @@ void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	// Check for incoming connections
 	Listen();
 
-	// Stream data to the client
-	SendLocation();
-
-	// Receive messages from the client and check for "STOP" message
 	if (ConnectionSocket) {
+		// Stream data to the client
+		if (CheckConnection()) {
+			SendLocation();
+		}
+
+		// Receive messages from the client and check for "STOP" message
 		uint32 Size;
 		while (ConnectionSocket->HasPendingData(Size)) {
 			uint8* ReceivedData = new uint8[Size];
@@ -73,11 +75,11 @@ void UWheelchairServer::StartServer() {
 
 void UWheelchairServer::StopServer() {
 	UE_LOG(LogTemp, Warning, TEXT("Stopping server"));
-	if (ConnectionSocket) {
+	if (ConnectionSocket != nullptr) {
 		ConnectionSocket->Close();
 		// ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ConnectionSocket); // DO NOT USE AS IT CRASHES THE ENGINE
 	}
-	if (ServerSocket) {
+	if (ServerSocket != nullptr) {
 		ServerSocket->Close();
 		// ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ServerSocket);  // DO NOT USE AS IT CRASHES THE ENGINE
 	}
@@ -119,4 +121,22 @@ void UWheelchairServer::Listen() {
 	}
 
 	FPlatformProcess::Sleep(0.01);
+}
+
+bool UWheelchairServer::CheckConnection() {
+	if (!ConnectionSocket) {
+		return false;
+	}
+
+	// Attempt to send a small piece of data as a heartbeat
+	const char* HeartbeatData = "HB";
+	int32 Size = 2; // Size of the heartbeat data
+	int32 Sent = 0;
+	if (!ConnectionSocket->Send((uint8*)HeartbeatData, Size, Sent)) {
+		// If sending fails, it indicates the connection might be closed
+		// UE_LOG(LogTemp, Warning, TEXT("Connection appears to be closed."));
+		return false;
+	}
+
+	return true; // Connection is still valid
 }
