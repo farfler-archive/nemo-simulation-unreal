@@ -7,7 +7,12 @@
 		{
 			"Name": "nemo_simulator",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"Networking",
+				"Sockets"
+			]
 		}
 	],
 	"Plugins": [
