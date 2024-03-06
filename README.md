@@ -14,6 +14,7 @@ This repository contains the Nemo Simulator (Unreal Engine) project for simulati
   - `P`: Toggle the free camera mode, which allows you to navigate  the enivorment independently of the wheelchair
 * Sensor streaming
 * Extendible architecture
+* Xbox controller support
 
 ### Getting started
 

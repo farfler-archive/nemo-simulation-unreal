@@ -57,7 +57,7 @@ float USensorLIDAR::TraceLine(float Angle)
 	}
 	else {
 		if (bShouldDrawTrace) {
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 0.2f);
 		}
 		return MaxDistance;
 	}
