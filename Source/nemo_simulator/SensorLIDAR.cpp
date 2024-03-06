@@ -34,12 +34,13 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	}
 }
 
-float USensorLIDAR::TraceLine(float Direction)
+float USensorLIDAR::TraceLine(float Angle)
 {
 	FVector Start = GetOwner()->GetActorLocation();
-	FVector DirectionVector = GetOwner()->GetActorForwardVector();
-	DirectionVector = DirectionVector.RotateAngleAxis(Direction, FVector(0, 0, 1));
-	FVector End = Start + DirectionVector * MaxDistance;
+
+	FRotator OwnerRotation = GetOwner()->GetActorRotation();
+	FVector EndOffset = FVector(MaxDistance * FMath::Cos(FMath::DegreesToRadians(Angle)), MaxDistance * FMath::Sin(FMath::DegreesToRadians(Angle)), 0.0f);
+	FVector End = Start + OwnerRotation.RotateVector(EndOffset);
 
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;

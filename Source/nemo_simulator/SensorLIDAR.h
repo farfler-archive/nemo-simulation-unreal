@@ -29,6 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) bool bShouldDrawTrace = true;
 
 private:
-	float TraceLine(float Direction);
+	float TraceLine(float Angle);
 		
 };
