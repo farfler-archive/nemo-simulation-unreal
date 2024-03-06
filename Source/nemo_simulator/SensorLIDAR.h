@@ -24,10 +24,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) float MaxDistance = 1000.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) float MinDistance = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) bool bShouldDrawTrace = true;
+
 private:
-	UPROPERTY(EditAnywhere)	float MaxDistance = 1000.0f;
-	UPROPERTY(EditAnywhere)	float MinDistance = 0.0f;
-	
 	float TraceLine(float Direction);
 		
 };

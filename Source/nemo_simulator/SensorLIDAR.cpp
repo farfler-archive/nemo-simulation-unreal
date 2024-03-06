@@ -48,12 +48,16 @@ float USensorLIDAR::TraceLine(float Direction)
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams);
 
 	if (HitResult.bBlockingHit) {
-		DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.1f, 0, 1);
-		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10, FColor::Green, false, 0.1f, 0);
+		if (bShouldDrawTrace) {
+			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.1f, 0, 0.2f);
+			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10, FColor::Green, false, 0.1f, 0);
+		}
 		return HitResult.Distance;
 	}
 	else {
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1);
+		if (bShouldDrawTrace) {
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1);
+		}
 		return MaxDistance;
 	}
 }
