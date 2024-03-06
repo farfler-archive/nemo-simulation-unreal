@@ -6,6 +6,8 @@
 #include "Sockets.h"
 #include "Networking.h"
 
+#include "SensorLIDAR.h"
+
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "WheelchairServer.generated.h"
@@ -49,4 +51,10 @@ private:
 
 	void Listen();
 	bool CheckConnection();
+
+	// References to the LIDAR sensors
+	USensorLIDAR* LIDAR_FR; // Front right
+	USensorLIDAR* LIDAR_FL; // Front left
+	USensorLIDAR* LIDAR_RR; // Rear right
+	USensorLIDAR* LIDAR_RL; // Rear left
 };

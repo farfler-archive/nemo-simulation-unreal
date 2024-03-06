@@ -1,5 +1,6 @@
-#include "SocketSubsystem.h"
 #include "WheelchairServer.h"
+
+#include "SocketSubsystem.h"
 
 // Sets default values for this component's properties
 UWheelchairServer::UWheelchairServer()
@@ -12,6 +13,54 @@ UWheelchairServer::UWheelchairServer()
 void UWheelchairServer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Get all child actors of the owner actor
+	TArray<AActor*> ChildActors;
+	GetOwner()->GetAttachedActors(ChildActors);
+
+	int NumLidarsSet = 0; // Number of LIDAR components set
+
+	for (AActor* ChildActor : ChildActors) {
+		// Check if the child actor is a LIDAR component
+		if (ChildActor->GetName().StartsWith("BP_LIDAR")) {
+			// Get the LIDAR component from the child actor
+			USensorLIDAR* LIDAR = Cast<USensorLIDAR>(ChildActor->GetComponentByClass(USensorLIDAR::StaticClass()));
+
+			// Get the name of the LIDAR component
+			FString LIDARSensorName = LIDAR->SensorName;
+
+			// Set the LIDAR component based on its name
+			if (LIDARSensorName == "LIDAR_FR")
+			{
+				LIDAR_FR = LIDAR; // Set the front right LIDAR component
+				UE_LOG(LogTemp, Log, TEXT("LIDAR_FR: %s -> %s"), *LIDAR_FR->GetName(), *LIDAR_FR->SensorName);
+				NumLidarsSet++;
+			} else if (LIDARSensorName == "LIDAR_FL")
+			{
+				LIDAR_FL = LIDAR; // Set the front left LIDAR component
+				UE_LOG(LogTemp, Log, TEXT("LIDAR_FL: %s -> %s"), *LIDAR_FL->GetName(), *LIDAR_FL->SensorName);
+				NumLidarsSet++;
+			} else if (LIDARSensorName == "LIDAR_RR")
+			{
+				LIDAR_RR = LIDAR; // Set the rear right LIDAR component
+				UE_LOG(LogTemp, Log, TEXT("LIDAR_RR: %s -> %s"), *LIDAR_RR->GetName(), *LIDAR_RR->SensorName);
+				NumLidarsSet++;
+			} else if (LIDARSensorName == "LIDAR_RL")
+			{
+				LIDAR_RL = LIDAR; // Set the rear left LIDAR component
+				UE_LOG(LogTemp, Log, TEXT("LIDAR_RL: %s -> %s"), *LIDAR_RL->GetName(), *LIDAR_RL->SensorName);
+				NumLidarsSet++;
+			}
+		}
+	}
+
+	// Check if all LIDAR components are set
+	if (NumLidarsSet == 4) {
+		UE_LOG(LogTemp, Log, TEXT("All LIDAR sensors set"));
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("Not all LIDAR sensors set"));
+	}
+
 	StartServer();
 }
 
