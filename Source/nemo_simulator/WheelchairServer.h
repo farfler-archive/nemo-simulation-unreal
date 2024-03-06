@@ -1,46 +1,52 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 // Include libraries for socket communication
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Sockets.h"
-#include "SocketSubsystem.h"
 #include "Networking.h"
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "WheelchairServer.generated.h"
 
+/**
+ * A server component designed for a Wheelchair simulation in Unreal Engine.
+ * Handles TCP socket communication to send the wheelchair's location and receive commands.
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NEMO_SIMULATOR_API UWheelchairServer : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UWheelchairServer();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+private:
+	// Socket for the server
+	FSocket* ServerSocket;
+
+	// Socket for the client connection
+	FSocket* ConnectionSocket;
+	
+	// Endpoint (IP address and port) for the server
+	FIPv4Endpoint Endpoint;
+
+	// Flag to control whether the server should listen for incoming connections
+	bool bShouldListen = true;
 
 	void StartServer();
 	void StopServer();
-	bool SendLocation(); // TODO: Implement for any data
-
-private:
-	FSocket* ServerSocket;
-	FSocket* ConnectionSocket;
-	FIPv4Endpoint Endpoint;
-	bool bShouldListen = true;
+	
+	bool SendLocation();
 
 	void Listen();
 	bool CheckConnection();
-		
 };

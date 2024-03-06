@@ -1,142 +1,125 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+#include "SocketSubsystem.h"
 #include "WheelchairServer.h"
 
 // Sets default values for this component's properties
 UWheelchairServer::UWheelchairServer()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
+	// Enable ticking for this component
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
-
-// Called when the game starts
+// Called when the game starts or the component is created
 void UWheelchairServer::BeginPlay()
 {
 	Super::BeginPlay();
-
 	StartServer();
 }
 
+
+// Called when the game ends or the component is destroyed
+void UWheelchairServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	StopServer();
+	Super::EndPlay(EndPlayReason);
+}
 
 // Called every frame
 void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Check for incoming connections
-	Listen();
+	Listen(); // Listen for incoming client connections
 
+	// If a client is connected
 	if (ConnectionSocket) {
-		// Stream data to the client
+		// Check if the connection is still alive
 		if (CheckConnection()) {
-			SendLocation();
-		}
-
-		// Receive messages from the client and check for "STOP" message
-		uint32 Size;
-		while (ConnectionSocket->HasPendingData(Size)) {
-			uint8* ReceivedData = new uint8[Size];
-			int32 Read = 0;
-			ConnectionSocket->Recv(ReceivedData, Size, Read);
-			FString ReceivedMessage = FString(UTF8_TO_TCHAR(ReceivedData));
-			UE_LOG(LogTemp, Warning, TEXT("Received: %s"), *ReceivedMessage);
-			if (ReceivedMessage.StartsWith("STOP")) {
-				StopServer();
-			}
+			SendLocation(); // Send the wheelchair's location to the client
 		}
 	}
 }
 
-void UWheelchairServer::StartServer() {
-	UE_LOG(LogTemp, Warning, TEXT("Starting server"));
-	// Create a socket
-	FIPv4Address::Parse(TEXT("127.0.0.1"), Endpoint.Address);
-	Endpoint.Port = 12345;
-	ServerSocket = FTcpSocketBuilder(TEXT("WheelchairLocationServer"))
+// Start the server and create a socket
+void UWheelchairServer::StartServer()
+{
+	FIPv4Address::Parse(TEXT("127.0.0.1"), Endpoint.Address); // Set the server's IP address
+	Endpoint.Port = 12345; // Set the server's port
+
+	// Create a reusable TCP socket bound to the specified endpoint and listen for incoming connections
+	ServerSocket = FTcpSocketBuilder(TEXT("WheelchairLocationServerSocket"))
 		.AsReusable()
 		.BoundToEndpoint(Endpoint)
 		.Listening(8);
 
-	// Check if the socket was created successfully
-	if (!ServerSocket) {
-		UE_LOG(LogTemp, Warning, TEXT("Failed to create server socket"));
-		return;
-	} else {
-		UE_LOG(LogTemp, Warning, TEXT("Server socket created"));
-	}
+	ServerSocket->SetNonBlocking(true); // Set the server socket to non-blocking mode
 
-	// Set the socket to non-blocking
-	ServerSocket->SetNonBlocking(true);
+	UE_LOG(LogTemp, Log, TEXT("Server started at %s:%d"), *Endpoint.Address.ToString(), Endpoint.Port);
 }
 
-void UWheelchairServer::StopServer() {
-	UE_LOG(LogTemp, Warning, TEXT("Stopping server"));
-	if (ConnectionSocket != nullptr) {
+// Stop the server and clean up the sockets
+void UWheelchairServer::StopServer()
+{
+	// If a client is connected, close and destroy the connection socket
+	if (ConnectionSocket) {
 		ConnectionSocket->Close();
-		// ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ConnectionSocket); // DO NOT USE AS IT CRASHES THE ENGINE
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ConnectionSocket);
+		ConnectionSocket = nullptr;
 	}
-	if (ServerSocket != nullptr) {
+
+	// Close and destroy the server socket
+	if (ServerSocket) {
 		ServerSocket->Close();
-		// ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ServerSocket);  // DO NOT USE AS IT CRASHES THE ENGINE
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ServerSocket);
+		ServerSocket = nullptr;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Server stopped"));
 }
 
-bool UWheelchairServer::SendLocation() {
-	if (!ConnectionSocket || !ConnectionSocket->GetConnectionState()) {
-		return false;
-	}
+// Send the wheelchair's location to the connected client
+bool UWheelchairServer::SendLocation()
+{
+	if (!ConnectionSocket) return false; // Return false if no client is connected
 
-	// Encode the location as a string
-	FVector ActorPositon = GetOwner()->GetActorLocation();
-	FString LocationString = FString::Printf(TEXT("%f %f %f"), ActorPositon.X, ActorPositon.Y, ActorPositon.Z);
-	TCHAR* SerializedChar = LocationString.GetCharArray().GetData();
-	int32 Size = FCString::Strlen(SerializedChar) + 1;
+	FVector ActorPosition = GetOwner()->GetActorLocation(); // Get the position of the owner actor
+	FString LocationString = FString::Printf(TEXT("%f %f %f"), ActorPosition.X, ActorPosition.Y, ActorPosition.Z); // Convert the position to a string
+
+	int32 Size = FCString::Strlen(*LocationString) + 1; // Size of the location string
 	int32 Sent = 0;
 
-	bool Result = ConnectionSocket->Send((uint8*)TCHAR_TO_UTF8(SerializedChar), Size, Sent);
-
-	UE_LOG(LogTemp, Warning, TEXT("Sent: %s"), *LocationString);
-
-	return Result;
+	// Send the location string to the client
+	return ConnectionSocket->Send((uint8*)TCHAR_TO_UTF8(*LocationString), Size, Sent);
 }
 
-void UWheelchairServer::Listen() {
-	// Check for pending connections
-	if (!ServerSocket) {
-		return;
-	}
+// Listen for incoming client connections
+void UWheelchairServer::Listen()
+{
+	if (!ServerSocket || !bShouldListen) return; // Return if the server socket is not valid or if the server should not listen
+
 	bool Pending;
 	ServerSocket->HasPendingConnection(Pending);
+
 	if (Pending) {
-		UE_LOG(LogTemp, Warning, TEXT("Pending connection"));
-		// Accept the connection
-		ConnectionSocket = ServerSocket->Accept(TEXT("WheelchairLocationServer"));
+		UE_LOG(LogTemp, Log, TEXT("Pending connection"))
+
+		// If there is a pending connection, accept it and create a connection socket
+		ConnectionSocket = ServerSocket->Accept(TEXT("WheelchairLocationConnectionSocket"));
+		
 		if (ConnectionSocket) {
-			UE_LOG(LogTemp, Warning, TEXT("Connection established"));
+			UE_LOG(LogTemp, Log, TEXT("Client connected from %s"), *ConnectionSocket->GetDescription())
 		}
 	}
-
-	FPlatformProcess::Sleep(0.01);
 }
 
-bool UWheelchairServer::CheckConnection() {
-	if (!ConnectionSocket) {
-		return false;
-	}
+// Check if the client connection is still alive
+bool UWheelchairServer::CheckConnection()
+{
+	if (!ConnectionSocket) return false; // Return false if no client is connected
 
-	// Attempt to send a small piece of data as a heartbeat
-	const char* HeartbeatData = "HB";
-	int32 Size = 2; // Size of the heartbeat data
+	const char* HearbeatData = "HB";
+	int32 Size = 2;
 	int32 Sent = 0;
-	if (!ConnectionSocket->Send((uint8*)HeartbeatData, Size, Sent)) {
-		// If sending fails, it indicates the connection might be closed
-		// UE_LOG(LogTemp, Warning, TEXT("Connection appears to be closed."));
-		return false;
-	}
 
-	return true; // Connection is still valid
+	// Send the heartbeat data to the client
+	return ConnectionSocket->Send((uint8*)HearbeatData, Size, Sent);
 }
