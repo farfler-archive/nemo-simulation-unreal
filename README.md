@@ -2,6 +2,8 @@
 
 This repository contains the Nemo Simulator (Unreal Engine) project for simulating a self-driving wheelchair in a virtual environment. The simulation allows for testing and development of the wheelchair's autonomous navigation system by providing a realistic 3D environment and streaming sensor data over a TCP connection.
 
+![Simulation Showcase](./Content/Misc/banner.png)
+
 ### Features
 
 * Simulated environment
