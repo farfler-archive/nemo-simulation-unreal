@@ -29,8 +29,10 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (int i = 0; i < 360; i++) {
-		float Distance = TraceLine(i);
+	float Angle = 0.0f;
+	for (int i = 0; i < NumRays; i++) {
+		Angle = i * (360.0f / NumRays);
+		float Distance = TraceLine(Angle);
 	}
 }
 
@@ -50,14 +52,14 @@ float USensorLIDAR::TraceLine(float Angle)
 
 	if (HitResult.bBlockingHit) {
 		if (bShouldDrawTrace) {
-			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.1f, 0, 0.2f);
+			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.1f, 0, RayThickness);
 			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10, FColor::Green, false, 0.1f, 0);
 		}
 		return HitResult.Distance;
 	}
 	else {
 		if (bShouldDrawTrace) {
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 0.2f);
+			DrawDebugLine(GetWorld(), Start, End, RayColor, false, 0.1f, 0, RayThickness);
 		}
 		return MaxDistance;
 	}

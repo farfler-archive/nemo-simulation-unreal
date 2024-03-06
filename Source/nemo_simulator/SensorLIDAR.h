@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) float MinDistance = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) bool bShouldDrawTrace = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) FString SensorName = "LIDAR";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) FColor RayColor = FColor::Red;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) float RayThickness = 0.2f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAcces = "true")) int NumRays = 360;
 
 private:
 	float TraceLine(float Angle);

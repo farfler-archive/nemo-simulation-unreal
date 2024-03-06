@@ -23,5 +23,9 @@
 				"Editor"
 			]
 		}
+	],
+	"TargetPlatforms": [
+		"Linux",
+		"Windows"
 	]
 }
