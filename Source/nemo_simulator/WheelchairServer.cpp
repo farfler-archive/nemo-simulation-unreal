@@ -58,23 +58,7 @@ void UWheelchairServer::BeginPlay()
 	if (NumLidarsSet == 4) {
 		UE_LOG(LogTemp, Log, TEXT("All LIDAR sensors set"));
 
-		// Set colors of the LIDAR components
-		LIDAR_FR->RayColor = FColor::FromHex("ff595e");
-		LIDAR_FL->RayColor = FColor::FromHex("ffca3a");
-		LIDAR_RR->RayColor = FColor::FromHex("8ac926");
-		LIDAR_RL->RayColor = FColor::FromHex("1982c4");
-
-		// Set the thickness of the LIDAR rays
-		LIDAR_FR->RayThickness = 2.0f;
-		LIDAR_FL->RayThickness = 2.0f;
-		LIDAR_RR->RayThickness = 2.0f;
-		LIDAR_RL->RayThickness = 2.0f;
-
-		// Set the number of rays of the LIDAR components
-		LIDAR_FR->NumRays = 36;
-		LIDAR_FL->NumRays = 36;
-		LIDAR_RR->NumRays = 36;
-		LIDAR_RL->NumRays = 36;
+		SetupLIDARParams(); // Set up the LIDAR parameters
 
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("Not all LIDAR sensors set"));
@@ -190,4 +174,25 @@ bool UWheelchairServer::CheckConnection()
 
 	// Send the heartbeat data to the client
 	return ConnectionSocket->Send((uint8*)HearbeatData, Size, Sent);
+}
+
+void UWheelchairServer::SetupLIDARParams()
+{
+	// Set colors of the LIDAR components
+	LIDAR_FR->RayColor = FColor::FromHex("ff595e"); // Red
+	LIDAR_FL->RayColor = FColor::FromHex("ffca3a"); // Yellow
+	LIDAR_RR->RayColor = FColor::FromHex("8ac926"); // Green
+	LIDAR_RL->RayColor = FColor::FromHex("1982c4"); // Blue
+
+	// Set the thickness of the LIDAR rays
+	LIDAR_FR->RayThickness = 2.0f;
+	LIDAR_FL->RayThickness = 2.0f;
+	LIDAR_RR->RayThickness = 2.0f;
+	LIDAR_RL->RayThickness = 2.0f;
+
+	// Set the number of rays of the LIDAR components
+	LIDAR_FR->NumRays = 36;
+	LIDAR_FL->NumRays = 36;
+	LIDAR_RR->NumRays = 36;
+	LIDAR_RL->NumRays = 36;
 }

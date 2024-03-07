@@ -44,17 +44,19 @@ private:
 	// Flag to control whether the server should listen for incoming connections
 	bool bShouldListen = true;
 
-	void StartServer();
-	void StopServer();
+	void StartServer(); // Start the server and create a socket
+	void StopServer(); // Stop the server and close the socket
 	
-	bool SendLocation();
+	bool SendLocation(); // Send the wheelchair's location to the client
 
-	void Listen();
-	bool CheckConnection();
+	void Listen(); // Listen for incoming client connections
+	bool CheckConnection(); // Check if the connection is still alive
 
 	// References to the LIDAR sensors
 	USensorLIDAR* LIDAR_FR; // Front right
 	USensorLIDAR* LIDAR_FL; // Front left
 	USensorLIDAR* LIDAR_RR; // Rear right
 	USensorLIDAR* LIDAR_RL; // Rear left
+
+	void SetupLIDARParams(); // Set up the LIDAR parameters
 };
