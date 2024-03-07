@@ -52,14 +52,14 @@ float USensorLIDAR::TraceLine(float Angle)
 
 	if (HitResult.bBlockingHit) {
 		if (bShouldDrawTrace) {
-			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.1f, 0, RayThickness);
-			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10, FColor::Green, false, 0.1f, 0);
+			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, -1.0f, 0, RayThickness);
+			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10, FColor::Green, false, -1.0f, 0);
 		}
 		return HitResult.Distance;
 	}
 	else {
 		if (bShouldDrawTrace) {
-			DrawDebugLine(GetWorld(), Start, End, RayColor, false, 0.1f, 0, RayThickness);
+			DrawDebugLine(GetWorld(), Start, End, RayColor, false, -1.0f, 0, RayThickness);
 		}
 		return MaxDistance;
 	}
