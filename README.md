@@ -18,6 +18,15 @@ This repository contains the Nemo Simulator (Unreal Engine) project for simulati
 
 ### Getting started
 
+#### Windows Requirements
+
+* Unreal Engine 5.3
+* Visual Studio
+  - Tested versions: `17.8.6` and `17.10.0 (preview)`
+  - [VS Integration Tool](https://www.unrealengine.com/marketplace/en-US/product/visual-studio-integration-tool)
+
+#### Setup
+
 1. Clone the repository: `git clone https://github.com/farfler/nemo-simulation-unreal`
 2. Open the project in Unreal Engine 5.3
 3. Build and run the project
