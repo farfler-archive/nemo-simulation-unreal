@@ -94,7 +94,7 @@ void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 // Start the server and create a socket
 void UWheelchairServer::StartServer()
 {
-	FIPv4Address::Parse(TEXT("127.0.0.1"), Endpoint.Address); // Set the server's IP address
+	FIPv4Address::Parse(TEXT("192.168.100.81"), Endpoint.Address); // Set the server's IP address
 	Endpoint.Port = 12345; // Set the server's port
 
 	// Create a reusable TCP socket bound to the specified endpoint and listen for incoming connections
@@ -139,8 +139,25 @@ bool UWheelchairServer::SendLocation()
 	int32 Size = FCString::Strlen(*LocationString) + 1; // Size of the location string
 	int32 Sent = 0;
 
+	UE_LOG(LogTemp, Log, TEXT("Location packet: %s"), *LocationString)
+
 	// Send the location string to the client
-	return ConnectionSocket->Send((uint8*)TCHAR_TO_UTF8(*LocationString), Size, Sent);
+	// return ConnectionSocket->Send((uint8*)TCHAR_TO_UTF8(*LocationString), Size, Sent);
+
+	struct Position {
+		float x;
+		float y;
+		float z;
+	};
+	Position pos;
+	pos.x = (float) ActorPosition.X;
+	pos.y = (float) ActorPosition.Y;
+	pos.z = (float) ActorPosition.Z;
+
+	UE_LOG(LogTemp, Log, TEXT("Location packet: %f %f %f"), pos.x, pos.y, pos.z)
+
+	// Send positon struct to client
+	return ConnectionSocket->Send((uint8*)&pos, sizeof(Position), Sent);
 }
 
 // Listen for incoming client connections
@@ -167,6 +184,8 @@ void UWheelchairServer::Listen()
 bool UWheelchairServer::CheckConnection()
 {
 	if (!ConnectionSocket) return false; // Return false if no client is connected
+
+	return true; // Don't send heartbeat data for now
 
 	const char* HearbeatData = "HB";
 	int32 Size = 2;
