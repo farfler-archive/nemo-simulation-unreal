@@ -3,8 +3,7 @@
 // Include libraries for socket communication
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Sockets.h"
-#include "Networking.h"
+#include "SocketManager.h"
 
 #include "SensorLIDAR.h"
 
@@ -32,25 +31,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	// Socket for the server
-	FSocket* ServerSocket;
-
-	// Socket for the client connection
-	FSocket* ConnectionSocket;
-	
-	// Endpoint (IP address and port) for the server
-	FIPv4Endpoint Endpoint;
+	// Socket manager
+	SocketManager* SocketMgr;
 
 	// Flag to control whether the server should listen for incoming connections
 	bool bShouldListen = true;
 
-	void StartServer(); // Start the server and create a socket
-	void StopServer(); // Stop the server and close the socket
-	
 	bool SendLocation(); // Send the wheelchair's location to the client
-
-	void Listen(); // Listen for incoming client connections
-	bool CheckConnection(); // Check if the connection is still alive
 
 	// References to the LIDAR sensors
 	USensorLIDAR* LIDAR_FR; // Front right
