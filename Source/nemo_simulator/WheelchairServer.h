@@ -37,8 +37,6 @@ private:
 	// Flag to control whether the server should listen for incoming connections
 	bool bShouldListen = true;
 
-	bool SendLocation(); // Send the wheelchair's location to the client
-
 	// References to the LIDAR sensors
 	USensorLIDAR* LIDAR_FR; // Front right
 	USensorLIDAR* LIDAR_FL; // Front left
@@ -46,4 +44,8 @@ private:
 	USensorLIDAR* LIDAR_RL; // Rear left
 
 	void SetupLIDARParams(); // Set up the LIDAR parameters
+
+	// Communication functions
+	bool SendLocation(); // Send the wheelchair's location to the client
+	bool SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan); // Send a LIDAR scan to the client
 };

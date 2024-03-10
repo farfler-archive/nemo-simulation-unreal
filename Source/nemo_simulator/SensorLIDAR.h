@@ -35,6 +35,7 @@ public:
 	};
 
 	SensorMsgLaserScan GetLatestLaserScan();
+	void PrintLaserScan(SensorMsgLaserScan LaserScan);
 
 protected:
 	// Called when the game starts
@@ -56,7 +57,5 @@ private:
 	float TraceLine(float Angle);
 
 	SensorMsgLaserScan LatestLaserScan;
-
-	void PrintLaserScan(SensorMsgLaserScan LaserScan);
 		
 };
