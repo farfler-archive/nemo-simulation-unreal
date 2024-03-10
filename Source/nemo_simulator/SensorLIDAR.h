@@ -16,6 +16,26 @@ public:
 	// Sets default values for this component's properties
 	USensorLIDAR();
 
+	struct SensorMsgLaserScan
+	{
+		std::string header_frame_id;
+		int32_t header_stamp_sec;
+		uint32_t header_stamp_nanosec;
+
+		float angle_min;
+		float angle_max;
+		float angle_increment;
+		float time_increment;
+		float scan_time;
+		float range_min;
+		float range_max;
+
+		std::vector<float> ranges;
+		std::vector<float> intensities;
+	};
+
+	SensorMsgLaserScan GetLatestLaserScan();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -34,5 +54,9 @@ public:
 
 private:
 	float TraceLine(float Angle);
+
+	SensorMsgLaserScan LatestLaserScan;
+
+	void PrintLaserScan(SensorMsgLaserScan LaserScan);
 		
 };
