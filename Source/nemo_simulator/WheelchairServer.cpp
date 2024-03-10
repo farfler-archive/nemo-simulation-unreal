@@ -108,7 +108,10 @@ void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			USensorLIDAR::SensorMsgLaserScan LidarScanRR = LIDAR_RR->GetLatestLaserScan();
 			// LIDAR_RR->PrintLaserScan(LidarScanRR);
 			// Send the latest laser scan to the client
-			SendLIDARScan(LidarScanRR);
+			bool Success = SendLIDARScan(LidarScanRR);
+			if (!Success) {
+				UE_LOG(LogTemp, Warning, TEXT("Failed to send LIDAR scan"));
+			}
 		}
 	}
 }
@@ -220,15 +223,18 @@ bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan
 
 	std::vector<char> buffer;
 	SerializeLIDARScan(LidarScan, buffer);
-	size_t PacketSize = buffer.size();
 
-	// Send size_t to client with packet size information
-	if (!SocketMgr->SendData((uint8*)&PacketSize, sizeof(size_t))) return false;
+	const size_t PacketSize = buffer.size() + sizeof(size_t);
+	std::vector<char> packet(PacketSize);
 
-	UE_LOG(LogTemp, Log, TEXT("LIDAR packet size: %d"), PacketSize)
+	// Copy the packet size and LIDAR scan data into the packet
+	std::memcpy(packet.data(), &PacketSize, sizeof(size_t));
+	std::memcpy(packet.data() + sizeof(size_t), buffer.data(), buffer.size());
 
-	// Send LIDAR scan to client
-	return SocketMgr->SendData((uint8*)buffer.data(), PacketSize);
+	UE_LOG(LogTemp, Log, TEXT("LIDAR packet size: %llu"), static_cast<unsigned long long>(PacketSize));
+
+	// Send the packet to the client
+	return SocketMgr->SendData(reinterpret_cast<const uint8*>(packet.data()), PacketSize);
 }
 
 void UWheelchairServer::SetupLIDARParams()
