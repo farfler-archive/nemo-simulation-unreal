@@ -48,4 +48,6 @@ private:
 	// Communication functions
 	bool SendLocation(); // Send the wheelchair's location to the client
 	bool SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan); // Send a LIDAR scan to the client
+
+	double LastSendTime = 0; // Time of the last sent message
 };

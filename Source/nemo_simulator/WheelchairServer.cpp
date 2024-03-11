@@ -95,6 +95,10 @@ void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+
+	// Limit to max 30 updates per second
+	if (FPlatformTime::Seconds() - LastSendTime < 1.0f / 30.0f) return;
+
 	// Check if socket is valid
 	if (SocketMgr) {
 		SocketMgr->ListenForConnections(); // Listen for new connections
@@ -114,6 +118,8 @@ void UWheelchairServer::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 			}
 		}
 	}
+
+	LastSendTime = FPlatformTime::Seconds();
 }
 
 // Send the wheelchair's location to the connected client
@@ -139,6 +145,26 @@ bool UWheelchairServer::SendLocation()
 	return SocketMgr->SendData((uint8*)&pos, sizeof(Position));
 }
 
+bool IsLittleEndian() {
+	uint16_t test = 0x1; // Use a 16-bit integer with a value that will reveal byte ordering
+	return *((uint8_t*)&test) == 0x1; // Check the first byte; if it's 1, it's little-endian
+}
+
+// Implementation of htonl: Host TO Network Long
+uint32_t my_htonl(uint32_t hostlong) {
+	if (IsLittleEndian()) {
+		// If the system is little-endian, swap the byte order
+		return ((hostlong >> 24) & 0x000000FF) | // Move byte 3 to byte 0
+			((hostlong << 8) & 0x00FF0000) | // Move byte 1 to byte 2
+			((hostlong >> 8) & 0x0000FF00) | // Move byte 2 to byte 1
+			((hostlong << 24) & 0xFF000000); // Move byte 0 to byte 3
+	}
+	else {
+		// If the system is big-endian, no need to convert
+		return hostlong;
+	}
+}
+
 bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan)
 {
 	if (!SocketMgr) return false; // Return false if no client is connected
@@ -148,8 +174,11 @@ bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan
 	const size_t PacketSize = buffer.size() + sizeof(size_t);
 	std::vector<char> packet(PacketSize);
 
+	// Conver packet size to network byte order
+	size_t PacketSizeNBO = my_htonl(PacketSize);
+
 	// Copy the packet size and LIDAR scan data into the packet
-	std::memcpy(packet.data(), &PacketSize, sizeof(size_t));
+	std::memcpy(packet.data(), &PacketSizeNBO, sizeof(size_t));
 	std::memcpy(packet.data() + sizeof(size_t), buffer.data(), buffer.size());
 
 	UE_LOG(LogTemp, Log, TEXT("LIDAR packet size: %llu"), static_cast<unsigned long long>(PacketSize));
