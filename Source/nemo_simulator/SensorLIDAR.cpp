@@ -37,8 +37,8 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	NewLaserScan.header_stamp_nanosec = static_cast<uint32_t>((GetWorld()->GetTimeSeconds() - LatestLaserScan.header_stamp_sec) * 1e9);
 
 	// Set the scan parameters
-	NewLaserScan.angle_min = 0.0f;
-	NewLaserScan.angle_max = 360.0f * PI / 180.0f;
+	NewLaserScan.angle_min = -PI;
+	NewLaserScan.angle_max = PI;
 	NewLaserScan.angle_increment = (LatestLaserScan.angle_max - LatestLaserScan.angle_min) / NumRays;
 	NewLaserScan.time_increment = 0.0f; // Assuming the time between scans is negligible
 	NewLaserScan.scan_time = 0.0f; // Assuming the scan time is negligible
@@ -47,16 +47,18 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 	// Resize the ranges and intensities vectors
 	NewLaserScan.ranges.resize(NumRays, 0.0f);
-	NewLaserScan.intensities.resize(NumRays, 0.0f);
+	// NOTE: Do not send intensities, as ROS does not use them
+	// NewLaserScan.intensities.resize(NumRays, 0.0f);
 
 	// Trace the rays
 
 	float Angle = 0.0f;
 	for (int i = 0; i < NumRays; i++) {
 		Angle = i * (360.0f / NumRays);
-		float Distance = TraceLine(Angle);
+		float Distance = TraceLine(-Angle); // NOTE: The angle is negated to match the Unreal Engine coordinate system
 		NewLaserScan.ranges[i] = Distance;
-		NewLaserScan.intensities[i] = 1.0f;
+		// NOTE: Do not send intensities, as ROS does not use them
+		// NewLaserScan.intensities[i] = 1.0f;
 	}
 
 	// Update the latest laser scan
@@ -119,4 +121,86 @@ void USensorLIDAR::PrintLaserScan(SensorMsgLaserScan LaserScan)
 	UE_LOG(LogTemp, Warning, TEXT("LatestLaserScan.intensities[0]: %f"), LatestLaserScan.intensities[0]);
 	UE_LOG(LogTemp, Warning, TEXT("LatestLaserScan.ranges[NumRays - 1]: %f"), LatestLaserScan.ranges[NumRays - 1]);
 	UE_LOG(LogTemp, Warning, TEXT("LatestLaserScan.intensities[NumRays - 1]: %f"), LatestLaserScan.intensities[NumRays - 1]);
+}
+
+std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& LaserScan)
+{
+	std::vector<char> buffer;
+
+	buffer.clear();
+	size_t offset = 0;
+
+	size_t header_frame_id_size = LaserScan.header_frame_id.size();
+	buffer.resize(offset + sizeof(header_frame_id_size));
+	memcpy(buffer.data() + offset, &header_frame_id_size, sizeof(header_frame_id_size));
+	offset += sizeof(header_frame_id_size);
+
+	buffer.resize(offset + header_frame_id_size);
+	memcpy(buffer.data() + offset, LaserScan.header_frame_id.data(), header_frame_id_size);
+	offset += header_frame_id_size;
+
+	int32_t header_stamp_sec = LaserScan.header_stamp_sec;
+	buffer.resize(offset + sizeof(header_stamp_sec));
+	memcpy(buffer.data() + offset, &LaserScan.header_stamp_sec, sizeof(LaserScan.header_stamp_sec));
+	offset += sizeof(LaserScan.header_stamp_sec);
+
+	uint32_t header_stamp_nanosec = LaserScan.header_stamp_nanosec;
+	buffer.resize(offset + sizeof(header_stamp_nanosec));
+	memcpy(buffer.data() + offset, &LaserScan.header_stamp_nanosec, sizeof(LaserScan.header_stamp_nanosec));
+	offset += sizeof(LaserScan.header_stamp_nanosec);
+
+	float angle_min = LaserScan.angle_min;
+	buffer.resize(offset + sizeof(angle_min));
+	memcpy(buffer.data() + offset, &LaserScan.angle_min, sizeof(LaserScan.angle_min));
+	offset += sizeof(LaserScan.angle_min);
+
+	float angle_max = LaserScan.angle_max;
+	buffer.resize(offset + sizeof(angle_max));
+	memcpy(buffer.data() + offset, &LaserScan.angle_max, sizeof(LaserScan.angle_max));
+	offset += sizeof(LaserScan.angle_max);
+
+	float angle_increment = LaserScan.angle_increment;
+	buffer.resize(offset + sizeof(angle_increment));
+	memcpy(buffer.data() + offset, &LaserScan.angle_increment, sizeof(LaserScan.angle_increment));
+	offset += sizeof(LaserScan.angle_increment);
+
+	float time_increment = LaserScan.time_increment;
+	buffer.resize(offset + sizeof(time_increment));
+	memcpy(buffer.data() + offset, &LaserScan.time_increment, sizeof(LaserScan.time_increment));
+	offset += sizeof(LaserScan.time_increment);
+
+	float scan_time = LaserScan.scan_time;
+	buffer.resize(offset + sizeof(scan_time));
+	memcpy(buffer.data() + offset, &LaserScan.scan_time, sizeof(LaserScan.scan_time));
+	offset += sizeof(LaserScan.scan_time);
+
+	float range_min = LaserScan.range_min;
+	buffer.resize(offset + sizeof(range_min));
+	memcpy(buffer.data() + offset, &LaserScan.range_min, sizeof(LaserScan.range_min));
+	offset += sizeof(LaserScan.range_min);
+
+	float range_max = LaserScan.range_max;
+	buffer.resize(offset + sizeof(range_max));
+	memcpy(buffer.data() + offset, &LaserScan.range_max, sizeof(LaserScan.range_max));
+	offset += sizeof(LaserScan.range_max);
+
+	size_t ranges_size = LaserScan.ranges.size();
+	buffer.resize(offset + sizeof(ranges_size));
+	memcpy(buffer.data() + offset, &ranges_size, sizeof(ranges_size));
+	offset += sizeof(ranges_size);
+
+	buffer.resize(offset + ranges_size * sizeof(float));
+	memcpy(buffer.data() + offset, LaserScan.ranges.data(), ranges_size * sizeof(float));
+	offset += ranges_size * sizeof(float);
+
+	size_t intensities_size = LaserScan.intensities.size();
+	buffer.resize(offset + sizeof(intensities_size));
+	memcpy(buffer.data() + offset, &intensities_size, sizeof(intensities_size));
+	offset += sizeof(intensities_size);
+
+	buffer.resize(offset + intensities_size * sizeof(float));
+	memcpy(buffer.data() + offset, LaserScan.intensities.data(), intensities_size * sizeof(float));
+	offset += intensities_size * sizeof(float);
+
+	return buffer;
 }

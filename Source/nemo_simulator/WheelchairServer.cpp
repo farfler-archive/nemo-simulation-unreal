@@ -139,90 +139,11 @@ bool UWheelchairServer::SendLocation()
 	return SocketMgr->SendData((uint8*)&pos, sizeof(Position));
 }
 
-void SerializeLIDARScan(const USensorLIDAR::SensorMsgLaserScan msg, std::vector<char>& buffer)
-{
-	buffer.clear();
-	size_t offset = 0;
-
-	size_t header_frame_id_size = msg.header_frame_id.size();
-	buffer.resize(offset + sizeof(header_frame_id_size));
-	memcpy(buffer.data() + offset, &header_frame_id_size, sizeof(header_frame_id_size));
-	offset += sizeof(header_frame_id_size);
-
-	buffer.resize(offset + header_frame_id_size);
-	memcpy(buffer.data() + offset, msg.header_frame_id.data(), header_frame_id_size);
-	offset += header_frame_id_size;
-
-	int32_t header_stamp_sec = msg.header_stamp_sec;
-	buffer.resize(offset + sizeof(header_stamp_sec));
-	memcpy(buffer.data() + offset, &msg.header_stamp_sec, sizeof(msg.header_stamp_sec));
-	offset += sizeof(msg.header_stamp_sec);
-
-	uint32_t header_stamp_nanosec = msg.header_stamp_nanosec;
-	buffer.resize(offset + sizeof(header_stamp_nanosec));
-	memcpy(buffer.data() + offset, &msg.header_stamp_nanosec, sizeof(msg.header_stamp_nanosec));
-	offset += sizeof(msg.header_stamp_nanosec);
-
-	float angle_min = msg.angle_min;
-	buffer.resize(offset + sizeof(angle_min));
-	memcpy(buffer.data() + offset, &msg.angle_min, sizeof(msg.angle_min));
-	offset += sizeof(msg.angle_min);
-
-	float angle_max = msg.angle_max;
-	buffer.resize(offset + sizeof(angle_max));
-	memcpy(buffer.data() + offset, &msg.angle_max, sizeof(msg.angle_max));
-	offset += sizeof(msg.angle_max);
-
-	float angle_increment = msg.angle_increment;
-	buffer.resize(offset + sizeof(angle_increment));
-	memcpy(buffer.data() + offset, &msg.angle_increment, sizeof(msg.angle_increment));
-	offset += sizeof(msg.angle_increment);
-
-	float time_increment = msg.time_increment;
-	buffer.resize(offset + sizeof(time_increment));
-	memcpy(buffer.data() + offset, &msg.time_increment, sizeof(msg.time_increment));
-	offset += sizeof(msg.time_increment);
-
-	float scan_time = msg.scan_time;
-	buffer.resize(offset + sizeof(scan_time));
-	memcpy(buffer.data() + offset, &msg.scan_time, sizeof(msg.scan_time));
-	offset += sizeof(msg.scan_time);
-
-	float range_min = msg.range_min;
-	buffer.resize(offset + sizeof(range_min));
-	memcpy(buffer.data() + offset, &msg.range_min, sizeof(msg.range_min));
-	offset += sizeof(msg.range_min);
-
-	float range_max = msg.range_max;
-	buffer.resize(offset + sizeof(range_max));
-	memcpy(buffer.data() + offset, &msg.range_max, sizeof(msg.range_max));
-	offset += sizeof(msg.range_max);
-
-	size_t ranges_size = msg.ranges.size();
-	buffer.resize(offset + sizeof(ranges_size));
-	memcpy(buffer.data() + offset, &ranges_size, sizeof(ranges_size));
-	offset += sizeof(ranges_size);
-
-	buffer.resize(offset + ranges_size * sizeof(float));
-	memcpy(buffer.data() + offset, msg.ranges.data(), ranges_size * sizeof(float));
-	offset += ranges_size * sizeof(float);
-
-	size_t intensities_size = msg.intensities.size();
-	buffer.resize(offset + sizeof(intensities_size));
-	memcpy(buffer.data() + offset, &intensities_size, sizeof(intensities_size));
-	offset += sizeof(intensities_size);
-
-	buffer.resize(offset + intensities_size * sizeof(float));
-	memcpy(buffer.data() + offset, msg.intensities.data(), intensities_size * sizeof(float));
-	offset += intensities_size * sizeof(float);
-}
-
 bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan)
 {
 	if (!SocketMgr) return false; // Return false if no client is connected
 
-	std::vector<char> buffer;
-	SerializeLIDARScan(LidarScan, buffer);
+	std::vector<char> buffer = USensorLIDAR::SerializeLaserScan(LidarScan);
 
 	const size_t PacketSize = buffer.size() + sizeof(size_t);
 	std::vector<char> packet(PacketSize);

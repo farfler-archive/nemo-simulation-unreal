@@ -36,6 +36,7 @@ public:
 
 	SensorMsgLaserScan GetLatestLaserScan();
 	void PrintLaserScan(SensorMsgLaserScan LaserScan);
+	static std::vector<char> SerializeLaserScan(const SensorMsgLaserScan& LaserScan);
 
 protected:
 	// Called when the game starts
