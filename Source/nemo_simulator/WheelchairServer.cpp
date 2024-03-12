@@ -150,20 +150,17 @@ bool IsLittleEndian() {
 	return *((uint8_t*)&test) == 0x1; // Check the first byte; if it's 1, it's little-endian
 }
 
-// Implementation of htonl: Host TO Network Long
+// Implementation of htonl: Host TO Network Long of uint32_t
 uint32_t my_htonl(uint32_t hostlong) {
 	if (IsLittleEndian()) {
-		// If the system is little-endian, swap the byte order
-		return ((hostlong >> 24) & 0x000000FF) | // Move byte 3 to byte 0
-			((hostlong << 8) & 0x00FF0000) | // Move byte 1 to byte 2
-			((hostlong >> 8) & 0x0000FF00) | // Move byte 2 to byte 1
-			((hostlong << 24) & 0xFF000000); // Move byte 0 to byte 3
+		// Convert from little-endian to big-endian
+		return ((hostlong & 0x000000FF) << 24) | ((hostlong & 0x0000FF00) << 8) | ((hostlong & 0x00FF0000) >> 8) | ((hostlong & 0xFF000000) >> 24);
 	}
 	else {
-		// If the system is big-endian, no need to convert
+		// Already big-endian
 		return hostlong;
 	}
-}
+}	
 
 bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan)
 {
@@ -171,13 +168,7 @@ bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan
 
 	std::vector<char> buffer = USensorLIDAR::SerializeLaserScan(LidarScan);
 
-	// Ensure packet size fits within uint32_t before casting, as size_t can be larger on some platforms
-	if (buffer.size() > std::numeric_limits<uint32_t>::max()) {
-		UE_LOG(LogTemp, Error, TEXT("LIDAR packet size exceeds maximum uint32_t value."));
-		return false;
-	}
-
-	size_t packet_size = buffer.size();
+	uint32_t packet_size = buffer.size();
 	uint32_t packet_size_net = my_htonl(static_cast<uint32_t>(packet_size)); // Convert packet size to network byte order
 
 	// Insert the size at the beginning of the buffer

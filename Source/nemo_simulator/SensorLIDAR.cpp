@@ -32,7 +32,7 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	SensorMsgLaserScan NewLaserScan = {};
 
 	// Fill in the header information
-	NewLaserScan.header_frame_id = std::string(TCHAR_TO_UTF8(*SensorName));
+	NewLaserScan.header_frame_id = std::string(TCHAR_TO_UTF8(*SensorName)).c_str();
 	NewLaserScan.header_stamp_sec = static_cast<int32_t>(GetWorld()->GetTimeSeconds());
 	NewLaserScan.header_stamp_nanosec = static_cast<uint32_t>((GetWorld()->GetTimeSeconds() - LatestLaserScan.header_stamp_sec) * 1e9);
 
@@ -47,8 +47,7 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 	// Resize the ranges and intensities vectors
 	NewLaserScan.ranges.resize(NumRays, 0.0f);
-	// NOTE: Do not send intensities, as ROS does not use them
-	// NewLaserScan.intensities.resize(NumRays, 0.0f);
+	NewLaserScan.intensities.resize(NumRays, 0.0f);
 
 	// Trace the rays
 
@@ -57,8 +56,7 @@ void USensorLIDAR::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		Angle = i * (360.0f / NumRays);
 		float Distance = TraceLine(-Angle); // NOTE: The angle is negated to match the Unreal Engine coordinate system
 		NewLaserScan.ranges[i] = Distance;
-		// NOTE: Do not send intensities, as ROS does not use them
-		// NewLaserScan.intensities[i] = 1.0f;
+		NewLaserScan.intensities[i] = 1.0f;
 	}
 
 	// Update the latest laser scan
@@ -128,10 +126,10 @@ std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& msg
 	std::vector<char> buffer;
 
 	buffer.clear();
-	size_t offset = 0;
+	uint32_t offset = 0;
 
 	// std_msgs/msg/Header frame_id size
-	size_t header_frame_id_size = msg.header_frame_id.size();
+	uint32_t header_frame_id_size = msg.header_frame_id.size();
 	buffer.resize(offset + sizeof(header_frame_id_size));
 	memcpy(buffer.data() + offset, &header_frame_id_size, sizeof(header_frame_id_size));
 	offset += sizeof(header_frame_id_size);
@@ -187,7 +185,7 @@ std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& msg
 	offset += sizeof(msg.range_max);
 
 	// sensor_msgs/msg/LaserScan ranges size
-	size_t ranges_size = msg.ranges.size();
+	uint32_t ranges_size = msg.ranges.size();
 	buffer.resize(offset + sizeof(ranges_size));
 	memcpy(buffer.data() + offset, &ranges_size, sizeof(ranges_size));
 	offset += sizeof(ranges_size);
@@ -198,7 +196,7 @@ std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& msg
 	offset += ranges_size * sizeof(float);
 
 	// sensor_msgs/msg/LaserScan intensities size
-	size_t intensities_size = msg.intensities.size();
+	uint32_t intensities_size = msg.intensities.size();
 	buffer.resize(offset + sizeof(intensities_size));
 	memcpy(buffer.data() + offset, &intensities_size, sizeof(intensities_size));
 	offset += sizeof(intensities_size);
