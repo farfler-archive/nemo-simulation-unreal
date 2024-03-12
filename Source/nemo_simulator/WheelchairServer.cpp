@@ -171,20 +171,24 @@ bool UWheelchairServer::SendLIDARScan(USensorLIDAR::SensorMsgLaserScan LidarScan
 
 	std::vector<char> buffer = USensorLIDAR::SerializeLaserScan(LidarScan);
 
-	const size_t PacketSize = buffer.size() + sizeof(size_t);
-	std::vector<char> packet(PacketSize);
+	// Ensure packet size fits within uint32_t before casting, as size_t can be larger on some platforms
+	if (buffer.size() > std::numeric_limits<uint32_t>::max()) {
+		UE_LOG(LogTemp, Error, TEXT("LIDAR packet size exceeds maximum uint32_t value."));
+		return false;
+	}
 
-	// Conver packet size to network byte order
-	size_t PacketSizeNBO = my_htonl(PacketSize);
+	size_t packet_size = buffer.size();
+	uint32_t packet_size_net = my_htonl(static_cast<uint32_t>(packet_size)); // Convert packet size to network byte order
 
-	// Copy the packet size and LIDAR scan data into the packet
-	std::memcpy(packet.data(), &PacketSizeNBO, sizeof(size_t));
-	std::memcpy(packet.data() + sizeof(size_t), buffer.data(), buffer.size());
+	// Insert the size at the beginning of the buffer
+	buffer.insert(buffer.begin(), reinterpret_cast<char*>(&packet_size_net), reinterpret_cast<char*>(&packet_size_net) + sizeof(packet_size_net));
 
-	UE_LOG(LogTemp, Log, TEXT("LIDAR packet size: %llu"), static_cast<unsigned long long>(PacketSize));
+	UE_LOG(LogTemp, Log, TEXT("LIDAR packet size: %llu"), static_cast<unsigned long long>(packet_size + sizeof(uint32_t)));
 
 	// Send the packet to the client
-	return SocketMgr->SendData(reinterpret_cast<const uint8*>(packet.data()), PacketSize);
+	bool sendResult = SocketMgr->SendData(reinterpret_cast<const uint8*>(buffer.data()), buffer.size());
+
+	return sendResult;
 }
 
 void UWheelchairServer::SetupLIDARParams()

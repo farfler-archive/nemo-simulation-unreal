@@ -123,83 +123,89 @@ void USensorLIDAR::PrintLaserScan(SensorMsgLaserScan LaserScan)
 	UE_LOG(LogTemp, Warning, TEXT("LatestLaserScan.intensities[NumRays - 1]: %f"), LatestLaserScan.intensities[NumRays - 1]);
 }
 
-std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& LaserScan)
+std::vector<char> USensorLIDAR::SerializeLaserScan(const SensorMsgLaserScan& msg)
 {
 	std::vector<char> buffer;
 
 	buffer.clear();
 	size_t offset = 0;
 
-	size_t header_frame_id_size = LaserScan.header_frame_id.size();
+	// std_msgs/msg/Header frame_id size
+	size_t header_frame_id_size = msg.header_frame_id.size();
 	buffer.resize(offset + sizeof(header_frame_id_size));
 	memcpy(buffer.data() + offset, &header_frame_id_size, sizeof(header_frame_id_size));
 	offset += sizeof(header_frame_id_size);
 
+	// std_msgs/msg/Header frame_id data
 	buffer.resize(offset + header_frame_id_size);
-	memcpy(buffer.data() + offset, LaserScan.header_frame_id.data(), header_frame_id_size);
+	memcpy(buffer.data() + offset, msg.header_frame_id.data(), header_frame_id_size);
 	offset += header_frame_id_size;
 
-	int32_t header_stamp_sec = LaserScan.header_stamp_sec;
-	buffer.resize(offset + sizeof(header_stamp_sec));
-	memcpy(buffer.data() + offset, &LaserScan.header_stamp_sec, sizeof(LaserScan.header_stamp_sec));
-	offset += sizeof(LaserScan.header_stamp_sec);
+	// builtin_interfaces/msg/Time sec
+	buffer.resize(offset + sizeof(msg.header_stamp_sec));
+	memcpy(buffer.data() + offset, &msg.header_stamp_sec, sizeof(msg.header_stamp_sec));
+	offset += sizeof(msg.header_stamp_sec);
 
-	uint32_t header_stamp_nanosec = LaserScan.header_stamp_nanosec;
-	buffer.resize(offset + sizeof(header_stamp_nanosec));
-	memcpy(buffer.data() + offset, &LaserScan.header_stamp_nanosec, sizeof(LaserScan.header_stamp_nanosec));
-	offset += sizeof(LaserScan.header_stamp_nanosec);
+	// builtin_interfaces/msg/Time nanosec
+	buffer.resize(offset + sizeof(msg.header_stamp_nanosec));
+	memcpy(buffer.data() + offset, &msg.header_stamp_nanosec, sizeof(msg.header_stamp_nanosec));
+	offset += sizeof(msg.header_stamp_nanosec);
 
-	float angle_min = LaserScan.angle_min;
-	buffer.resize(offset + sizeof(angle_min));
-	memcpy(buffer.data() + offset, &LaserScan.angle_min, sizeof(LaserScan.angle_min));
-	offset += sizeof(LaserScan.angle_min);
+	// sensor_msgs/msg/LaserScan angle_min
+	buffer.resize(offset + sizeof(msg.angle_min));
+	memcpy(buffer.data() + offset, &msg.angle_min, sizeof(msg.angle_min));
+	offset += sizeof(msg.angle_min);
 
-	float angle_max = LaserScan.angle_max;
-	buffer.resize(offset + sizeof(angle_max));
-	memcpy(buffer.data() + offset, &LaserScan.angle_max, sizeof(LaserScan.angle_max));
-	offset += sizeof(LaserScan.angle_max);
+	// sensor_msgs/msg/LaserScan angle_max
+	buffer.resize(offset + sizeof(msg.angle_max));
+	memcpy(buffer.data() + offset, &msg.angle_max, sizeof(msg.angle_max));
+	offset += sizeof(msg.angle_max);
 
-	float angle_increment = LaserScan.angle_increment;
-	buffer.resize(offset + sizeof(angle_increment));
-	memcpy(buffer.data() + offset, &LaserScan.angle_increment, sizeof(LaserScan.angle_increment));
-	offset += sizeof(LaserScan.angle_increment);
+	// sensor_msgs/msg/LaserScan angle_increment
+	buffer.resize(offset + sizeof(msg.angle_increment));
+	memcpy(buffer.data() + offset, &msg.angle_increment, sizeof(msg.angle_increment));
+	offset += sizeof(msg.angle_increment);
 
-	float time_increment = LaserScan.time_increment;
-	buffer.resize(offset + sizeof(time_increment));
-	memcpy(buffer.data() + offset, &LaserScan.time_increment, sizeof(LaserScan.time_increment));
-	offset += sizeof(LaserScan.time_increment);
+	// sensor_msgs/msg/LaserScan time_increment
+	buffer.resize(offset + sizeof(msg.time_increment));
+	memcpy(buffer.data() + offset, &msg.time_increment, sizeof(msg.time_increment));
+	offset += sizeof(msg.time_increment);
 
-	float scan_time = LaserScan.scan_time;
-	buffer.resize(offset + sizeof(scan_time));
-	memcpy(buffer.data() + offset, &LaserScan.scan_time, sizeof(LaserScan.scan_time));
-	offset += sizeof(LaserScan.scan_time);
+	// sensor_msgs/msg/LaserScan scan_time
+	buffer.resize(offset + sizeof(msg.scan_time));
+	memcpy(buffer.data() + offset, &msg.scan_time, sizeof(msg.scan_time));
+	offset += sizeof(msg.scan_time);
 
-	float range_min = LaserScan.range_min;
-	buffer.resize(offset + sizeof(range_min));
-	memcpy(buffer.data() + offset, &LaserScan.range_min, sizeof(LaserScan.range_min));
-	offset += sizeof(LaserScan.range_min);
+	// sensor_msgs/msg/LaserScan range_min
+	buffer.resize(offset + sizeof(msg.range_min));
+	memcpy(buffer.data() + offset, &msg.range_min, sizeof(msg.range_min));
+	offset += sizeof(msg.range_min);
 
-	float range_max = LaserScan.range_max;
-	buffer.resize(offset + sizeof(range_max));
-	memcpy(buffer.data() + offset, &LaserScan.range_max, sizeof(LaserScan.range_max));
-	offset += sizeof(LaserScan.range_max);
+	// sensor_msgs/msg/LaserScan range_max
+	buffer.resize(offset + sizeof(msg.range_max));
+	memcpy(buffer.data() + offset, &msg.range_max, sizeof(msg.range_max));
+	offset += sizeof(msg.range_max);
 
-	size_t ranges_size = LaserScan.ranges.size();
+	// sensor_msgs/msg/LaserScan ranges size
+	size_t ranges_size = msg.ranges.size();
 	buffer.resize(offset + sizeof(ranges_size));
 	memcpy(buffer.data() + offset, &ranges_size, sizeof(ranges_size));
 	offset += sizeof(ranges_size);
 
+	// sensor_msgs/msg/LaserScan ranges data
 	buffer.resize(offset + ranges_size * sizeof(float));
-	memcpy(buffer.data() + offset, LaserScan.ranges.data(), ranges_size * sizeof(float));
+	memcpy(buffer.data() + offset, msg.ranges.data(), ranges_size * sizeof(float));
 	offset += ranges_size * sizeof(float);
 
-	size_t intensities_size = LaserScan.intensities.size();
+	// sensor_msgs/msg/LaserScan intensities size
+	size_t intensities_size = msg.intensities.size();
 	buffer.resize(offset + sizeof(intensities_size));
 	memcpy(buffer.data() + offset, &intensities_size, sizeof(intensities_size));
 	offset += sizeof(intensities_size);
 
+	// sensor_msgs/msg/LaserScan intensities data
 	buffer.resize(offset + intensities_size * sizeof(float));
-	memcpy(buffer.data() + offset, LaserScan.intensities.data(), intensities_size * sizeof(float));
+	memcpy(buffer.data() + offset, msg.intensities.data(), intensities_size * sizeof(float));
 	offset += intensities_size * sizeof(float);
 
 	return buffer;
