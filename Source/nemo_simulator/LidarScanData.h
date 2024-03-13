@@ -4,9 +4,21 @@
 
 namespace LidarScanData
 {
-	// TODO: Add more data to this struct
 	struct LidarScanData
 	{
+		std::string frameId;
+		uint32_t stampSec;
+		uint32_t stampNanosec;
+		float angleMin;
+		float angleMax;
+		float angleIncrement;
+		float timeIncrement;
+		float scanTime;
+		float rangeMin;
+		float rangeMax;
 		std::vector <float> ranges;
+		std::vector <float> intensities;
 	};
+
+	void PrintLidarScanData(const LidarScanData& lidarScanData);
 }

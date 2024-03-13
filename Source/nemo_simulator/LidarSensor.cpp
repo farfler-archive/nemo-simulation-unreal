@@ -1,4 +1,5 @@
 #include "LidarSensor.h"
+#include "LidarScanData.h"
 
 ULidarSensor::ULidarSensor()
 {
@@ -15,6 +16,8 @@ void ULidarSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UpdateLidarScan(); // Update the Lidar scan data
+
+	LidarScanData::PrintLidarScanData(LatestLidarScanData);	// Print latest Lidar scan data
 }
 
 LidarScanData::LidarScanData ULidarSensor::GetLatestLidarScanData()
@@ -27,7 +30,20 @@ void ULidarSensor::UpdateLidarScan()
 {
 	LidarScanData::LidarScanData ScanData;
 
+	// Setup basic Lidar scan data parameters
+	ScanData.frameId = TCHAR_TO_UTF8(*LidarName);
+	ScanData.stampSec = static_cast<uint32_t>(GetWorld()->GetTimeSeconds());
+	ScanData.stampNanosec = static_cast<uint32_t>((GetWorld()->GetTimeSeconds() - ScanData.stampSec) * 1e9);
+	ScanData.angleMin = -PI;
+	ScanData.angleMax = PI;
+	ScanData.angleIncrement = 2 * PI / NumLidarRays;
+	ScanData.timeIncrement = 0.0;
+	ScanData.scanTime = 0.0;
+	ScanData.rangeMin = MinRange;
+	ScanData.rangeMax = MaxRange;
+
 	ScanData.ranges = std::vector<float>(NumLidarRays, 0.0f); // Initialize the ranges array with zeros
+	ScanData.intensities = std::vector<float>(NumLidarRays, 1.0f); // Initialize the intensities array with ones
 
 	const FVector SensorLocation = GetOwner()->GetActorLocation(); // Sensor's location
 	const FRotator SensorRotation = GetOwner()->GetActorRotation(); // Sensor's orientation
