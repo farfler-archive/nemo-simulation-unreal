@@ -1,3 +1,7 @@
+# ⚠️ Backup branch (March 13, 2024)
+
+Do not use this branch for development. It is a backup of the `main` branch as of March 13, 2024.
+
 ## About `nemo-simulation-unreal`
 
 This repository contains the Nemo Simulator (Unreal Engine) project for simulating a self-driving wheelchair in a virtual environment. The simulation allows for testing and development of the wheelchair's autonomous navigation system by providing a realistic 3D environment and streaming sensor data over a TCP connection.
