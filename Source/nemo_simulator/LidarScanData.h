@@ -7,7 +7,7 @@ namespace LidarScanData
 	struct LidarScanData
 	{
 		std::string frameId;
-		uint32_t stampSec;
+		int32_t stampSec;
 		uint32_t stampNanosec;
 		float angleMin;
 		float angleMax;
@@ -21,4 +21,5 @@ namespace LidarScanData
 	};
 
 	void PrintLidarScanData(const LidarScanData& lidarScanData);
+	std::vector<char> SerializeLidarScanData(const LidarScanData& lidarScanData);
 }
