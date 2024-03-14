@@ -15,6 +15,7 @@ public:
 	bool ListenForConnection();
 	bool SendData(const std::vector<uint8_t>& Data);
 	void CloseServer();
+	bool IsConnected() const;
 
 private:
 	FSocket* ServerSocket;

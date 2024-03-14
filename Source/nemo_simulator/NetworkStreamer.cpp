@@ -79,6 +79,11 @@ void NetworkStreamer::CloseServer()
 	CloseSocket(ConnectionSocket);
 }
 
+bool NetworkStreamer::IsConnected() const
+{
+	return ConnectionSocket != nullptr;
+}
+
 void NetworkStreamer::CloseSocket(FSocket*& Socket)
 {
 	if (Socket)

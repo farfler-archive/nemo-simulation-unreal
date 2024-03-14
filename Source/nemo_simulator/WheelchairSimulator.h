@@ -23,8 +23,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	float LatestUpdateTime = 0;
+
+	// Network socket for streaming data
 	NetworkStreamer NetworkStreamer;
 
+	// Lidar sensors
 	ULidarSensor* LidarFR;
 	ULidarSensor* LidarFL;
 	ULidarSensor* LidarRR;
