@@ -26,17 +26,17 @@ public:
 
 public:
 	// Lidar sensor parameter settings
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	FString LidarName = "LIDAR"; // Name of the Lidar sensor
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	float MaxRange = 1000.0f; // Maximum sensing range of the Lidar in units
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	float MinRange = 0.0f; // Minimum sensing range of the Lidar in units
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	int NumLidarRays = 50; // Number of rays to simulate Lidar scanning
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	bool bDrawRay = true; // Whether to visualize the Lidar rays in the simulation environment
-	UPROPERTY(EditAnywhere, Category = "Lidar Sensor")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	FColor RayColor = FColor::Green; // Color of the Lidar rays in the simulation environment
 
 	// Returns the most recent Lidar scan data collected by the sensor

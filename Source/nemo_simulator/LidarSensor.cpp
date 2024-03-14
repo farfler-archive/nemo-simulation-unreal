@@ -17,7 +17,7 @@ void ULidarSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 	UpdateLidarScan(); // Update the Lidar scan data
 
-	LidarScanData::PrintLidarScanData(LatestLidarScanData);	// Print latest Lidar scan data
+	// LidarScanData::PrintLidarScanData(LatestLidarScanData);	// Print latest Lidar scan data
 }
 
 LidarScanData::LidarScanData ULidarSensor::GetLatestLidarScanData()

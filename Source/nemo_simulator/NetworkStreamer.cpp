@@ -1,9 +1,7 @@
 #include "NetworkStreamer.h"
 
-NetworkStreamer::NetworkStreamer()
+NetworkStreamer::NetworkStreamer() : ServerSocket(nullptr), ConnectionSocket(nullptr)
 {
-	ServerSocket = nullptr;
-	ConnectionSocket = nullptr;
 }
 
 NetworkStreamer::~NetworkStreamer()
@@ -28,6 +26,8 @@ bool NetworkStreamer::InitServer(const FString& ServerIP, const int32 Port)
 	}
 
 	ServerSocket->SetNonBlocking(true);
+
+	UE_LOG(LogTemp, Log, TEXT("Server initialized"));
 
 	return true;
 }
@@ -56,6 +56,8 @@ bool NetworkStreamer::ListenForConnection()
 	}
 
 	ConnectionSocket->SetNonBlocking(true);
+
+	UE_LOG(LogTemp, Log, TEXT("Connection accepted"));
 
 	return true;
 }

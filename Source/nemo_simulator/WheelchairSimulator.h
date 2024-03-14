@@ -1,6 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NetworkStreamer.h"
+#include "LidarSensor.h"
+
 #include "Components/ActorComponent.h"
 #include "WheelchairSimulator.generated.h"
 
@@ -19,5 +22,13 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+private:
+	NetworkStreamer NetworkStreamer;
 
+	ULidarSensor* LidarFR;
+	ULidarSensor* LidarFL;
+	ULidarSensor* LidarRR;
+	ULidarSensor* LidarRL;
+
+	bool SetupLidarSensors();
 };
