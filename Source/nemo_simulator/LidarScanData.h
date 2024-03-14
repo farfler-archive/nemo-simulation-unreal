@@ -21,5 +21,5 @@ namespace LidarScanData
 	};
 
 	void PrintLidarScanData(const LidarScanData& lidarScanData);
-	std::vector<char> SerializeLidarScanData(const LidarScanData& lidarScanData);
+	std::vector<uint8_t> SerializeLidarScanData(const LidarScanData& lidarScanData);
 }

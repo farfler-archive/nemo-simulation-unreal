@@ -22,9 +22,9 @@ void LidarScanData::PrintLidarScanData(const LidarScanData& lidarScanData)
 }
 
 // Serialize LidarScanData to a byte array
-std::vector<char> LidarScanData::SerializeLidarScanData(const LidarScanData& lidarScanData)
+std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& lidarScanData)
 {
-	std::vector<char> buffer;
+	std::vector<uint8_t> buffer;
 
 	buffer.clear();
 	uint32_t offset = 0;
