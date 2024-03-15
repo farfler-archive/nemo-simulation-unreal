@@ -1,5 +1,6 @@
 #include "WheelchairSimulator.h"
 #include "LidarScanData.h"
+#include "NetworkUtils.h"
 
 UWheelchairSimulator::UWheelchairSimulator()
 {
@@ -9,7 +10,7 @@ UWheelchairSimulator::UWheelchairSimulator()
 void UWheelchairSimulator::BeginPlay()
 {
 	Super::BeginPlay();
-	NetworkStreamer.InitServer("127.0.0.1", 12345);
+	NetworkStreamer.InitServer("192.168.100.81", 12345);
 
 	if (!SetupLidarSensors()) {
 		UE_LOG(LogTemp, Error, TEXT("Failed to setup Lidar sensors"));
@@ -34,10 +35,13 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 		// Create packet size header
 		std::vector<uint8_t> LidarScanPacket;
 		LidarScanPacket.resize(4);
-		*reinterpret_cast<uint32_t*>(LidarScanPacket.data()) = LatestLidarScan.size();
+		*reinterpret_cast<uint32_t*>(LidarScanPacket.data()) = NetworkUtils::ToNetworkOrder(LatestLidarScan.size());
 		LidarScanPacket.insert(LidarScanPacket.end(), LatestLidarScan.begin(), LatestLidarScan.end());
 
-		NetworkStreamer.SendData(LatestLidarScan);
+		bool Result = NetworkStreamer.SendData(LidarScanPacket);
+		if (!Result) {
+			UE_LOG(LogTemp, Error, TEXT("Failed to send Lidar scan data"));
+		}
 	}
 
 	LatestUpdateTime = GetWorld()->GetTimeSeconds();

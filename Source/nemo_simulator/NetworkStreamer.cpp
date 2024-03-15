@@ -27,7 +27,7 @@ bool NetworkStreamer::InitServer(const FString& ServerIP, const int32 Port)
 
 	ServerSocket->SetNonBlocking(true);
 
-	UE_LOG(LogTemp, Log, TEXT("Server initialized"));
+	UE_LOG(LogTemp, Log, TEXT("Server initialized at %s:%d"), *ServerIP, Port);
 
 	return true;
 }

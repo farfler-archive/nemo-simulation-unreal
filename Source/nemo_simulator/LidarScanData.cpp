@@ -1,4 +1,5 @@
 #include "LidarScanData.h"
+#include "NetworkUtils.h"
 
 // Print LidarScanData to the console
 void LidarScanData::PrintLidarScanData(const LidarScanData& lidarScanData)
@@ -31,8 +32,9 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 
 	// std_msgs/msg/Header frame_id size
 	uint32_t header_frame_id_size = lidarScanData.frameId.size();
+	uint32_t header_frame_id_size_network_order = NetworkUtils::ToNetworkOrder(header_frame_id_size);
 	buffer.resize(offset + sizeof(header_frame_id_size));
-	memcpy(buffer.data() + offset, &header_frame_id_size, sizeof(header_frame_id_size));
+	memcpy(buffer.data() + offset, &header_frame_id_size_network_order, sizeof(header_frame_id_size));
 	offset += sizeof(header_frame_id_size);
 
 	// std_msgs/msg/Header frame_id data
@@ -86,9 +88,10 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 	offset += sizeof(lidarScanData.rangeMax);
 
 	// sensor_msgs/msg/LaserScan ranges size
-	uint32_t ranges_size = lidarScanData.ranges.size();
+	uint32_t ranges_size =lidarScanData.ranges.size();
+	uint32_t ranges_size_network_order = NetworkUtils::ToNetworkOrder(ranges_size);
 	buffer.resize(offset + sizeof(ranges_size));
-	memcpy(buffer.data() + offset, &ranges_size, sizeof(ranges_size));
+	memcpy(buffer.data() + offset, &ranges_size_network_order, sizeof(ranges_size));
 	offset += sizeof(ranges_size);
 
 	// sensor_msgs/msg/LaserScan ranges data
@@ -98,8 +101,9 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 
 	// sensor_msgs/msg/LaserScan intensities size
 	uint32_t intensities_size = lidarScanData.intensities.size();
+	uint32_t intensities_size_network_order = NetworkUtils::ToNetworkOrder(intensities_size);
 	buffer.resize(offset + sizeof(intensities_size));
-	memcpy(buffer.data() + offset, &intensities_size, sizeof(intensities_size));
+	memcpy(buffer.data() + offset, &intensities_size_network_order, sizeof(intensities_size));
 	offset += sizeof(intensities_size);
 
 	// sensor_msgs/msg/LaserScan intensities data
