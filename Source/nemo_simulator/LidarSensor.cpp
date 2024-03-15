@@ -50,7 +50,8 @@ void ULidarSensor::UpdateLidarScan()
 
 	// Simulate Lidar rays around the sensor
 	for (int RayIndex = 0; RayIndex < NumLidarRays; RayIndex++) {
-		const float AngleInDegrees = RayIndex * 360.0f / NumLidarRays; // Angle for the current ray
+		float AngleInDegrees = RayIndex * 360.0f / NumLidarRays; // Angle for the current ray
+		AngleInDegrees = 360.0f - AngleInDegrees; // Reverse the angle to match ROS's coordinate system
 		// Cast a ray and store the distance to the hit point
 		float RayDistance = CastLidarRay(SensorLocation, SensorRotation, AngleInDegrees);
 		ScanData.ranges[RayIndex] = RayDistance; // Store the distance in the ranges array
