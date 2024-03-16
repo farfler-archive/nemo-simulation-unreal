@@ -30,6 +30,16 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 	buffer.clear();
 	uint32_t offset = 0;
 
+	// builtin_interfaces/msg/Time sec
+	buffer.resize(offset + sizeof(lidarScanData.stampSec));
+	memcpy(buffer.data() + offset, &lidarScanData.stampSec, sizeof(lidarScanData.stampSec));
+	offset += sizeof(lidarScanData.stampSec);
+
+	// builtin_interfaces/msg/Time nanosec
+	buffer.resize(offset + sizeof(lidarScanData.stampNanosec));
+	memcpy(buffer.data() + offset, &lidarScanData.stampNanosec, sizeof(lidarScanData.stampNanosec));
+	offset += sizeof(lidarScanData.stampNanosec);
+
 	// std_msgs/msg/Header frame_id size
 	uint32_t header_frame_id_size = lidarScanData.frameId.size();
 	uint32_t header_frame_id_size_network_order = NetworkUtils::ToNetworkOrder(header_frame_id_size);
@@ -41,16 +51,6 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 	buffer.resize(offset + header_frame_id_size);
 	memcpy(buffer.data() + offset, lidarScanData.frameId.data(), header_frame_id_size);
 	offset += header_frame_id_size;
-
-	// builtin_interfaces/msg/Time sec
-	buffer.resize(offset + sizeof(lidarScanData.stampSec));
-	memcpy(buffer.data() + offset, &lidarScanData.stampSec, sizeof(lidarScanData.stampSec));
-	offset += sizeof(lidarScanData.stampSec);
-
-	// builtin_interfaces/msg/Time nanosec
-	buffer.resize(offset + sizeof(lidarScanData.stampNanosec));
-	memcpy(buffer.data() + offset, &lidarScanData.stampNanosec, sizeof(lidarScanData.stampNanosec));
-	offset += sizeof(lidarScanData.stampNanosec);
 
 	// sensor_msgs/msg/LaserScan angle_min
 	buffer.resize(offset + sizeof(lidarScanData.angleMin));
