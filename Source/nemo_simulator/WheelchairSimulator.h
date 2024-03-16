@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "NetworkStreamer.h"
-#include "LidarSensor.h"
+#include "SensorManager.h"
 
 #include "Components/ActorComponent.h"
 #include "WheelchairSimulator.generated.h"
@@ -28,11 +28,8 @@ private:
 	// Network socket for streaming data
 	NetworkStreamer NetworkStreamer;
 
-	// Lidar sensors
-	ULidarSensor* LidarFR;
-	ULidarSensor* LidarFL;
-	ULidarSensor* LidarRR;
-	ULidarSensor* LidarRL;
+	// Sensor manager
+	SensorManager SensorManager;
 
-	bool SetupLidarSensors();
+	void SetupSensors();
 };
