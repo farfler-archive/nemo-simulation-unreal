@@ -18,6 +18,7 @@ std::vector<uint8_t> NetworkUtils::CreateDataPacketWithHeader(const std::vector<
 {
 	std::vector<uint8_t> DataPacket;
 	uint32_t DataSize = static_cast<uint32_t>(Data.size());
+	DataPacket.resize(4);
 	*reinterpret_cast<uint32_t*>(DataPacket.data()) = NetworkUtils::ToNetworkOrder(DataSize);
 	DataPacket.insert(DataPacket.end(), Data.begin(), Data.end());
 	return DataPacket;
