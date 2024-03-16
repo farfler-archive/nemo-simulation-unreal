@@ -32,11 +32,8 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
 
 	if (NetworkStreamer.IsConnected()) {
-		// Create packet size header
-		std::vector<uint8_t> LidarScanPacket;
-		LidarScanPacket.resize(4);
-		*reinterpret_cast<uint32_t*>(LidarScanPacket.data()) = NetworkUtils::ToNetworkOrder(LatestLidarScan.size());
-		LidarScanPacket.insert(LidarScanPacket.end(), LatestLidarScan.begin(), LatestLidarScan.end());
+		// Create complete packet with header
+		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamer.SendData(LidarScanPacket);
 		if (!Result) {
