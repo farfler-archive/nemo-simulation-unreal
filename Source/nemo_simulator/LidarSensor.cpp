@@ -31,7 +31,7 @@ void ULidarSensor::UpdateLidarScan()
 	LidarScanData::LidarScanData ScanData;
 
 	// Setup basic Lidar scan data parameters
-	ScanData.frameId = TCHAR_TO_UTF8(*LidarName);
+	ScanData.frameId = "LIDAR"; // TCHAR_TO_UTF8(*LidarName);
 	ScanData.stampSec = static_cast<uint32_t>(GetWorld()->GetTimeSeconds());
 	ScanData.stampNanosec = static_cast<uint32_t>((GetWorld()->GetTimeSeconds() - ScanData.stampSec) * 1e9);
 	ScanData.angleMin = -PI;
