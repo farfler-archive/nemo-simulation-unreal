@@ -11,7 +11,10 @@ UWheelchairSimulator::UWheelchairSimulator()
 void UWheelchairSimulator::BeginPlay()
 {
 	Super::BeginPlay();
-	NetworkStreamer.InitServer("192.168.100.81", 12345);
+	NetworkStreamerFR.InitServer("192.168.100.81", 12345);
+	NetworkStreamerFL.InitServer("192.168.100.81", 12346);
+	NetworkStreamerRR.InitServer("192.168.100.81", 12347);
+	NetworkStreamerRL.InitServer("192.168.100.81", 12348);
 
 	// Register sensors to the sensor manager
 	SetupSensors();
@@ -26,18 +29,56 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 		return;
 	}
 
-	NetworkStreamer.ListenForConnection();
+	NetworkStreamerFR.ListenForConnection();
+	NetworkStreamerFL.ListenForConnection();
+	NetworkStreamerRR.ListenForConnection();
+	NetworkStreamerRL.ListenForConnection();
 
-	ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FR"));
-	std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
-
-	if (NetworkStreamer.IsConnected()) {
-		// Create complete packet with header
+	// Create and send Front Right LIDAR scan data
+	if (NetworkStreamerFR.IsConnected()) {
+		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FR"));
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
-		bool Result = NetworkStreamer.SendData(LidarScanPacket);
+		bool Result = NetworkStreamerFR.SendData(LidarScanPacket);
 		if (!Result) {
-			UE_LOG(LogTemp, Error, TEXT("Failed to send Lidar scan data"));
+			UE_LOG(LogTemp, Error, TEXT("Failed to send Front Right Lidar scan data"));
+		}
+	}
+
+	// Create and send Front Left LIDAR scan data
+	if (NetworkStreamerFL.IsConnected()) {
+		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FL"));
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
+
+		bool Result = NetworkStreamerFL.SendData(LidarScanPacket);
+		if (!Result) {
+			UE_LOG(LogTemp, Error, TEXT("Failed to send Front Left Lidar scan data"));
+		}
+	}
+
+	// Create and send Rear Right LIDAR scan data
+	if (NetworkStreamerRR.IsConnected()) {
+		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RR"));
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
+
+		bool Result = NetworkStreamerRR.SendData(LidarScanPacket);
+		if (!Result) {
+			UE_LOG(LogTemp, Error, TEXT("Failed to send Rear Right Lidar scan data"));
+		}
+	}
+
+	// Create and send Rear Left LIDAR scan data
+	if (NetworkStreamerRL.IsConnected()) {
+		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RL"));
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
+
+		bool Result = NetworkStreamerRL.SendData(LidarScanPacket);
+		if (!Result) {
+			UE_LOG(LogTemp, Error, TEXT("Failed to send Rear Left Lidar scan data"));
 		}
 	}
 

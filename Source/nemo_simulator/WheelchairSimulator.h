@@ -26,7 +26,10 @@ private:
 	float LatestUpdateTime = 0;
 
 	// Network socket for streaming data
-	NetworkStreamer NetworkStreamer;
+	NetworkStreamer NetworkStreamerFR;
+	NetworkStreamer NetworkStreamerFL;
+	NetworkStreamer NetworkStreamerRR;
+	NetworkStreamer NetworkStreamerRL;
 
 	// Sensor manager
 	SensorManager SensorManager;
