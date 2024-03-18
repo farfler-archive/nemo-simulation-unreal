@@ -24,8 +24,11 @@ void UCameraSensor::BeginPlay()
 	SceneCaptureComponent->FOVAngle = FieldOfView;
 	SceneCaptureComponent->bCaptureEveryFrame = false;
 	SceneCaptureComponent->bCaptureOnMovement = false;
+	// Fix for issue "ScreenCapture has no viewstate..."
+	SceneCaptureComponent->bAlwaysPersistRenderingState = true;
+	// Fix for global illumination not being captured
+	SceneCaptureComponent->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 
-	// Create a render target
 	UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>();
 	RenderTarget->InitAutoFormat(640, 480);
 	SceneCaptureComponent->TextureTarget = RenderTarget;
@@ -56,9 +59,10 @@ void UCameraSensor::CaptureImage()
 	// Capture the image
 	SceneCaptureComponent->CaptureScene();
 	UTextureRenderTarget2D* RenderTarget = SceneCaptureComponent->TextureTarget;
+	RenderTarget->TargetGamma = 2.2f;
 	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
 	FReadSurfaceDataFlags ReadFlags;
-	ReadFlags.SetLinearToGamma(false);
+	ReadFlags.SetLinearToGamma(true);
 
 	TArray<FColor> SurfaceData;
 	if (RenderTargetResource->ReadPixels(SurfaceData, ReadFlags))
