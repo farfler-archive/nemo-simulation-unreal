@@ -2,6 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Engine/Texture2D.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "CameraSensor.generated.h"
 
 
@@ -19,5 +23,19 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
+	float FieldOfView = 90.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
+	float TargetCaptureFPS = 1.0f;
+
+private:
+	UCameraComponent* CameraComponent;
+	USceneCaptureComponent2D* SceneCaptureComponent;
+	
+	TArray<FColor> LatestImage;
+	
+	float TimeSinceLastCapture = 0.0f;
+
+	void CaptureImage();
 };
