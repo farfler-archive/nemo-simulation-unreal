@@ -37,7 +37,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Front Right LIDAR scan data
 	if (NetworkStreamerFR.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FR"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerFR.SendData(LidarScanPacket);
@@ -49,7 +49,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Front Left LIDAR scan data
 	if (NetworkStreamerFL.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FL"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerFL.SendData(LidarScanPacket);
@@ -61,7 +61,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Rear Right LIDAR scan data
 	if (NetworkStreamerRR.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RR"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerRR.SendData(LidarScanPacket);
@@ -73,7 +73,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Rear Left LIDAR scan data
 	if (NetworkStreamerRL.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RL"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLatestLidarScanData());
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerRL.SendData(LidarScanPacket);

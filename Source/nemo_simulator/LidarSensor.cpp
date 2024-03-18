@@ -20,7 +20,7 @@ void ULidarSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// LidarScanData::PrintLidarScanData(LatestLidarScanData);	// Print latest Lidar scan data
 }
 
-LidarScanData::LidarScanData ULidarSensor::GetLatestLidarScanData()
+LidarScanData::LidarScanData ULidarSensor::GetLidarScanData()
 {
 	return LatestLidarScanData;
 }

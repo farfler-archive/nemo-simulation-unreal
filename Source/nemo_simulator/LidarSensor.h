@@ -40,7 +40,7 @@ public:
 	FColor RayColor = FColor::Green; // Color of the Lidar rays in the simulation environment
 
 	// Returns the most recent Lidar scan data collected by the sensor
-	LidarScanData::LidarScanData GetLatestLidarScanData();
+	LidarScanData::LidarScanData GetLidarScanData();
 
 private:
 	LidarScanData::LidarScanData LatestLidarScanData; // Stores the latest Lidar scan data
