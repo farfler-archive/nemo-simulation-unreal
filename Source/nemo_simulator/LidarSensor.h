@@ -35,7 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	int NumLidarRays = 50; // Number of rays to simulate Lidar scanning
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
-	bool bDrawRay = true; // Whether to visualize the Lidar rays in the simulation environment
+	bool bDrawRay = false; // Whether to visualize the Lidar rays in the simulation environment
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	FColor RayColor = FColor::Green; // Color of the Lidar rays in the simulation environment
 

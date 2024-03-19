@@ -25,9 +25,11 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
+	FString CameraName = "CAMERA"; // Name of the Camera sensor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
 	float FieldOfView = 90.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
-	float TargetCaptureFPS = 1.0f;
+	float TargetCaptureFPS = 20.0f;
 
 private:
 	UCameraComponent* CameraComponent;

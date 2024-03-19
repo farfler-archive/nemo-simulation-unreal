@@ -67,7 +67,10 @@ void UCameraSensor::CaptureImage()
 	TArray<FColor> SurfaceData;
 	if (RenderTargetResource->ReadPixels(SurfaceData, ReadFlags))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Captured image from %s"), *GetOwner()->GetName());
 		LatestImage = SurfaceData;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to read pixels from render target"));
 	}
 }
