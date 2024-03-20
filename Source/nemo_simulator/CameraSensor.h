@@ -31,6 +31,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
 	float TargetCaptureFPS = 20.0f;
 
+	std::vector<uint8_t> GetLatestImage();
+
 private:
 	UCameraComponent* CameraComponent;
 	USceneCaptureComponent2D* SceneCaptureComponent;

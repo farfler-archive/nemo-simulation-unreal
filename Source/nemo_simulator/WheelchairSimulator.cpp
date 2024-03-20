@@ -15,6 +15,7 @@ void UWheelchairSimulator::BeginPlay()
 	NetworkStreamerFL.InitServer("192.168.100.81", 12346);
 	NetworkStreamerRR.InitServer("192.168.100.81", 12347);
 	NetworkStreamerRL.InitServer("192.168.100.81", 12348);
+	NetworkStreamerCamera.InitServer("192.168.100.81", 12349);
 
 	// Register sensors to the sensor manager
 	SetupSensors();
@@ -33,6 +34,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	NetworkStreamerFL.ListenForConnection();
 	NetworkStreamerRR.ListenForConnection();
 	NetworkStreamerRL.ListenForConnection();
+	NetworkStreamerCamera.ListenForConnection();
 
 	// Create and send Front Right LIDAR scan data
 	if (NetworkStreamerFR.IsConnected()) {
@@ -82,6 +84,18 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 		}
 	}
 
+	// Create and send camera image data
+	if (NetworkStreamerCamera.IsConnected()) {
+		UCameraSensor* Camera = SensorManager.GetCameraSensor(TEXT("CAMERA"));
+		std::vector<uint8_t> LatestImageData = Camera->GetLatestImage();
+		std::vector<uint8_t> ImageDataPacket = NetworkUtils::CreateDataPacketWithHeader(LatestImageData);
+
+		bool Result = NetworkStreamerCamera.SendData(ImageDataPacket);
+		if (!Result) {
+			UE_LOG(LogTemp, Error, TEXT("Failed to send camera image data"));
+		}
+	}
+
 	LatestUpdateTime = GetWorld()->GetTimeSeconds();
 }
 
@@ -95,6 +109,11 @@ void UWheelchairSimulator::SetupSensors()
 			ULidarSensor* Lidar = Cast<ULidarSensor>(ChildActor->GetComponentByClass(ULidarSensor::StaticClass()));
 			// Register LIDAR sensor
 			SensorManager.RegisterSensor(Lidar);
+		}
+		else if (ChildActor->GetName().StartsWith("BP_Camera")) {
+			UCameraSensor* Camera = Cast<UCameraSensor>(ChildActor->GetComponentByClass(UCameraSensor::StaticClass()));
+			// Register camera sensor
+			SensorManager.RegisterSensor(Camera);
 		}
 	}
 }

@@ -48,6 +48,18 @@ void UCameraSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	}
 }
 
+std::vector<uint8_t> UCameraSensor::GetLatestImage()
+{
+	std::vector<uint8_t> ImageData;
+	for (FColor Color : LatestImage)
+	{
+		ImageData.push_back(Color.R);
+		ImageData.push_back(Color.G);
+		ImageData.push_back(Color.B);
+	}
+	return ImageData;
+}
+
 void UCameraSensor::CaptureImage()
 {
 	if (!SceneCaptureComponent)

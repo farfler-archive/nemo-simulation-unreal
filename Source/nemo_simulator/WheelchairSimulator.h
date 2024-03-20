@@ -30,6 +30,7 @@ private:
 	NetworkStreamer NetworkStreamerFL;
 	NetworkStreamer NetworkStreamerRR;
 	NetworkStreamer NetworkStreamerRL;
+	NetworkStreamer NetworkStreamerCamera;
 
 	// Sensor manager
 	SensorManager SensorManager;
