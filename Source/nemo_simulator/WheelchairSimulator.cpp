@@ -1,6 +1,8 @@
 #include "WheelchairSimulator.h"
 #include "LidarScanData.h"
+#include "CameraImageData.h"
 #include "LidarSensor.h"
+#include "CameraSensor.h"
 #include "NetworkUtils.h"
 
 UWheelchairSimulator::UWheelchairSimulator()
@@ -87,7 +89,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send camera image data
 	if (NetworkStreamerCamera.IsConnected()) {
 		UCameraSensor* Camera = SensorManager.GetCameraSensor(TEXT("CAMERA"));
-		std::vector<uint8_t> LatestImageData = Camera->GetLatestImage();
+		std::vector<uint8_t> LatestImageData = CameraImageData::SerializeCameraImageData(Camera->GetLatestImage());
 		std::vector<uint8_t> ImageDataPacket = NetworkUtils::CreateDataPacketWithHeader(LatestImageData);
 
 		bool Result = NetworkStreamerCamera.SendData(ImageDataPacket);

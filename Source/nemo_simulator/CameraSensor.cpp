@@ -48,16 +48,9 @@ void UCameraSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	}
 }
 
-std::vector<uint8_t> UCameraSensor::GetLatestImage()
+CameraImageData::CameraImageData UCameraSensor::GetLatestImage()
 {
-	std::vector<uint8_t> ImageData;
-	for (FColor Color : LatestImage)
-	{
-		ImageData.push_back(Color.R);
-		ImageData.push_back(Color.G);
-		ImageData.push_back(Color.B);
-	}
-	return ImageData;
+	return LatestImage;
 }
 
 void UCameraSensor::CaptureImage()
@@ -79,7 +72,30 @@ void UCameraSensor::CaptureImage()
 	TArray<FColor> SurfaceData;
 	if (RenderTargetResource->ReadPixels(SurfaceData, ReadFlags))
 	{
-		LatestImage = SurfaceData;
+
+		CameraImageData::CameraImageData ImageData;
+
+		// Setup basic image data parameters
+		ImageData.frameId = "CAMERA"; // TCHAR_TO_UTF8(*CameraName);
+		ImageData.stampSec = static_cast<uint32_t>(GetWorld()->GetTimeSeconds());
+		ImageData.stampNanosec = static_cast<uint32_t>((GetWorld()->GetTimeSeconds() - ImageData.stampSec) * 1e9);
+		ImageData.width = RenderTarget->SizeX;
+		ImageData.height = RenderTarget->SizeY;
+		ImageData.encoding = "rgb8";
+		ImageData.isBigendian = 0;
+		ImageData.step = 3 * RenderTarget->SizeX;
+
+		std::vector<uint8_t> ImageBytes;
+		for (FColor Color : SurfaceData)
+		{
+			ImageBytes.push_back(Color.R);
+			ImageBytes.push_back(Color.G);
+			ImageBytes.push_back(Color.B);
+		}
+
+		ImageData.data = ImageBytes;
+
+		LatestImage = ImageData;
 	}
 	else
 	{

@@ -6,6 +6,7 @@
 #include "Engine/Texture2D.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "CameraImageData.h"
 #include "CameraSensor.generated.h"
 
 
@@ -31,13 +32,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Sensor")
 	float TargetCaptureFPS = 20.0f;
 
-	std::vector<uint8_t> GetLatestImage();
+	CameraImageData::CameraImageData GetLatestImage();
 
 private:
 	UCameraComponent* CameraComponent;
 	USceneCaptureComponent2D* SceneCaptureComponent;
 	
-	TArray<FColor> LatestImage;
+	CameraImageData::CameraImageData LatestImage;
 	
 	float TimeSinceLastCapture = 0.0f;
 
