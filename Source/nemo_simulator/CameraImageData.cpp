@@ -1,6 +1,23 @@
 #include "CameraImageData.h"
 #include "NetworkUtils.h"
 
+// Print CameraImageData to the console
+void CameraImageData::PrintCameraImageData(const CameraImageData& cameraImageData)
+{
+    UE_LOG(LogTemp, Log, TEXT("01. frameId: %s"), *FString(cameraImageData.frameId.c_str()));
+	UE_LOG(LogTemp, Log, TEXT("02. stampSec: %d"), cameraImageData.stampSec);
+	UE_LOG(LogTemp, Log, TEXT("03. stampNanosec: %d"), cameraImageData.stampNanosec);
+	UE_LOG(LogTemp, Log, TEXT("04. height: %d"), cameraImageData.height);
+	UE_LOG(LogTemp, Log, TEXT("05. width: %d"), cameraImageData.width);
+	UE_LOG(LogTemp, Log, TEXT("06. encoding: %s"), *FString(cameraImageData.encoding.c_str()));
+	UE_LOG(LogTemp, Log, TEXT("07. isBigendian: %d"), cameraImageData.isBigendian);
+	UE_LOG(LogTemp, Log, TEXT("08. step: %d"), cameraImageData.step);
+	UE_LOG(LogTemp, Log, TEXT("09. data size: %d"), cameraImageData.data.size());
+    UE_LOG(LogTemp, Log, TEXT("10. data[0]: %d"), cameraImageData.data[0]);
+    UE_LOG(LogTemp, Log, TEXT("11. data[-1]: %d"), cameraImageData.data[cameraImageData.data.size() - 1]);
+}
+
+// Serialize CameraImageData to a byte array
 std::vector<uint8_t> CameraImageData::SerializeCameraImageData(const CameraImageData& cameraImageData)
 {
     std::vector<uint8_t> buffer;

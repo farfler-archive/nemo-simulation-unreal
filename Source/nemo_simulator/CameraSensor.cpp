@@ -9,6 +9,7 @@ void UCameraSensor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Find the camera component on the owner actor
 	CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>();
 	if (!CameraComponent)
 	{
@@ -24,11 +25,14 @@ void UCameraSensor::BeginPlay()
 	SceneCaptureComponent->FOVAngle = FieldOfView;
 	SceneCaptureComponent->bCaptureEveryFrame = false;
 	SceneCaptureComponent->bCaptureOnMovement = false;
+
 	// Fix for issue "ScreenCapture has no viewstate..."
 	SceneCaptureComponent->bAlwaysPersistRenderingState = true;
+
 	// Fix for global illumination not being captured
 	SceneCaptureComponent->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 
+	// Create a render target for the scene capture component
 	UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>();
 	RenderTarget->InitAutoFormat(640, 480);
 	SceneCaptureComponent->TextureTarget = RenderTarget;
@@ -43,8 +47,8 @@ void UCameraSensor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	TimeSinceLastCapture += DeltaTime;
 	if (TimeSinceLastCapture >= (1.0f / TargetCaptureFPS))
 	{
-		CaptureImage();
-		TimeSinceLastCapture = 0.0f;
+		CaptureImage(); // Capture a new image
+		TimeSinceLastCapture = 0.0f; // Reset the time since last capture
 	}
 }
 
@@ -63,8 +67,10 @@ void UCameraSensor::CaptureImage()
 
 	// Capture the image
 	SceneCaptureComponent->CaptureScene();
+
 	UTextureRenderTarget2D* RenderTarget = SceneCaptureComponent->TextureTarget;
 	RenderTarget->TargetGamma = 2.2f;
+
 	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
 	FReadSurfaceDataFlags ReadFlags;
 	ReadFlags.SetLinearToGamma(true);
@@ -85,6 +91,7 @@ void UCameraSensor::CaptureImage()
 		ImageData.isBigendian = 0;
 		ImageData.step = 3 * RenderTarget->SizeX;
 
+		// Convert the surface data to a byte array
 		std::vector<uint8_t> ImageBytes;
 		for (FColor Color : SurfaceData)
 		{
@@ -95,7 +102,7 @@ void UCameraSensor::CaptureImage()
 
 		ImageData.data = ImageBytes;
 
-		LatestImage = ImageData;
+		LatestImage = ImageData; // Update the latest image data
 	}
 	else
 	{

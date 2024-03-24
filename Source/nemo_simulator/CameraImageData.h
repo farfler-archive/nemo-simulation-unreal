@@ -17,5 +17,6 @@ namespace CameraImageData
 		std::vector <uint8_t> data;
 	};
 
+	void PrintCameraImageData(const CameraImageData& cameraImageData);
 	std::vector<uint8_t> SerializeCameraImageData(const CameraImageData& cameraImageData);
 }
