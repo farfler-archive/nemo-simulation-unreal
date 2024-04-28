@@ -5,6 +5,8 @@
 #include "CameraSensor.h"
 #include "NetworkUtils.h"
 
+#define WHEELCHAIR_SPEED 4.0f
+
 UWheelchairSimulator::UWheelchairSimulator()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -97,6 +99,18 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 			UE_LOG(LogTemp, Error, TEXT("Failed to send camera image data"));
 		}
 	}
+
+	// Move actor forward by WHEELCHAIR_SPEED
+	FVector NewLocation = GetOwner()->GetActorLocation();
+	NewLocation += GetOwner()->GetActorForwardVector() * WHEELCHAIR_SPEED;
+	GetOwner()->SetActorLocation(NewLocation);
+	UE_LOG(LogTemp, Warning, TEXT("Actor location: %s"), *NewLocation.ToString());
+
+	// Rotate actor by 1 degree
+	FRotator NewRotation = GetOwner()->GetActorRotation();
+	NewRotation.Yaw += 1.0f;
+	GetOwner()->SetActorRotation(NewRotation);
+	UE_LOG(LogTemp, Warning, TEXT("Actor rotation: %s"), *NewRotation.ToString());
 
 	LatestUpdateTime = GetWorld()->GetTimeSeconds();
 }
