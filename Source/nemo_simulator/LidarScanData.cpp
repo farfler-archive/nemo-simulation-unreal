@@ -30,86 +30,28 @@ std::vector<uint8_t> LidarScanData::SerializeLidarScanData(const LidarScanData& 
 	buffer.clear();
 	uint32_t offset = 0;
 
-	// builtin_interfaces/msg/Time sec
-	buffer.resize(offset + sizeof(lidarScanData.stampSec));
-	memcpy(buffer.data() + offset, &lidarScanData.stampSec, sizeof(lidarScanData.stampSec));
-	offset += sizeof(lidarScanData.stampSec);
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.stampSec), reinterpret_cast<const char *>(&lidarScanData.stampSec) + sizeof(lidarScanData.stampSec));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.stampNanosec), reinterpret_cast<const char *>(&lidarScanData.stampNanosec) + sizeof(lidarScanData.stampNanosec));
 
-	// builtin_interfaces/msg/Time nanosec
-	buffer.resize(offset + sizeof(lidarScanData.stampNanosec));
-	memcpy(buffer.data() + offset, &lidarScanData.stampNanosec, sizeof(lidarScanData.stampNanosec));
-	offset += sizeof(lidarScanData.stampNanosec);
+	uint32_t header_frame_id_size = NetworkUtils::ToNetworkOrder(static_cast<uint32_t>(lidarScanData.frameId.size()));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&header_frame_id_size), reinterpret_cast<const char *>(&header_frame_id_size) + sizeof(header_frame_id_size));
+	buffer.insert(buffer.end(), lidarScanData.frameId.begin(), lidarScanData.frameId.end());
 
-	// std_msgs/msg/Header frame_id size
-	uint32_t header_frame_id_size = lidarScanData.frameId.size();
-	uint32_t header_frame_id_size_network_order = NetworkUtils::ToNetworkOrder(header_frame_id_size);
-	buffer.resize(offset + sizeof(header_frame_id_size));
-	memcpy(buffer.data() + offset, &header_frame_id_size_network_order, sizeof(header_frame_id_size));
-	offset += sizeof(header_frame_id_size);
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.angleMin), reinterpret_cast<const char *>(&lidarScanData.angleMin) + sizeof(lidarScanData.angleMin));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.angleMax), reinterpret_cast<const char *>(&lidarScanData.angleMax) + sizeof(lidarScanData.angleMax));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.angleIncrement), reinterpret_cast<const char *>(&lidarScanData.angleIncrement) + sizeof(lidarScanData.angleIncrement));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.timeIncrement), reinterpret_cast<const char *>(&lidarScanData.timeIncrement) + sizeof(lidarScanData.timeIncrement));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.scanTime), reinterpret_cast<const char *>(&lidarScanData.scanTime) + sizeof(lidarScanData.scanTime));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.rangeMin), reinterpret_cast<const char *>(&lidarScanData.rangeMin) + sizeof(lidarScanData.rangeMin));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&lidarScanData.rangeMax), reinterpret_cast<const char *>(&lidarScanData.rangeMax) + sizeof(lidarScanData.rangeMax));
 
-	// std_msgs/msg/Header frame_id data
-	buffer.resize(offset + header_frame_id_size);
-	memcpy(buffer.data() + offset, lidarScanData.frameId.data(), header_frame_id_size);
-	offset += header_frame_id_size;
+	uint32_t ranges_size = NetworkUtils::ToNetworkOrder(static_cast<uint32_t>(lidarScanData.ranges.size()));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&ranges_size), reinterpret_cast<const char *>(&ranges_size) + sizeof(ranges_size));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(lidarScanData.ranges.data()), reinterpret_cast<const char *>(lidarScanData.ranges.data()) + lidarScanData.ranges.size() * sizeof(float));
 
-	// sensor_msgs/msg/LaserScan angle_min
-	buffer.resize(offset + sizeof(lidarScanData.angleMin));
-	memcpy(buffer.data() + offset, &lidarScanData.angleMin, sizeof(lidarScanData.angleMin));
-	offset += sizeof(lidarScanData.angleMin);
-
-	// sensor_msgs/msg/LaserScan angle_max
-	buffer.resize(offset + sizeof(lidarScanData.angleMax));
-	memcpy(buffer.data() + offset, &lidarScanData.angleMax, sizeof(lidarScanData.angleMax));
-	offset += sizeof(lidarScanData.angleMax);
-
-	// sensor_msgs/msg/LaserScan angle_increment
-	buffer.resize(offset + sizeof(lidarScanData.angleIncrement));
-	memcpy(buffer.data() + offset, &lidarScanData.angleIncrement, sizeof(lidarScanData.angleIncrement));
-	offset += sizeof(lidarScanData.angleIncrement);
-
-	// sensor_msgs/msg/LaserScan time_increment
-	buffer.resize(offset + sizeof(lidarScanData.timeIncrement));
-	memcpy(buffer.data() + offset, &lidarScanData.timeIncrement, sizeof(lidarScanData.timeIncrement));
-	offset += sizeof(lidarScanData.timeIncrement);
-
-	// sensor_msgs/msg/LaserScan scan_time
-	buffer.resize(offset + sizeof(lidarScanData.scanTime));
-	memcpy(buffer.data() + offset, &lidarScanData.scanTime, sizeof(lidarScanData.scanTime));
-	offset += sizeof(lidarScanData.scanTime);
-
-	// sensor_msgs/msg/LaserScan range_min
-	buffer.resize(offset + sizeof(lidarScanData.rangeMin));
-	memcpy(buffer.data() + offset, &lidarScanData.rangeMin, sizeof(lidarScanData.rangeMin));
-	offset += sizeof(lidarScanData.rangeMin);
-
-	// sensor_msgs/msg/LaserScan range_max
-	buffer.resize(offset + sizeof(lidarScanData.rangeMax));
-	memcpy(buffer.data() + offset, &lidarScanData.rangeMax, sizeof(lidarScanData.rangeMax));
-	offset += sizeof(lidarScanData.rangeMax);
-
-	// sensor_msgs/msg/LaserScan ranges size
-	uint32_t ranges_size =lidarScanData.ranges.size();
-	uint32_t ranges_size_network_order = NetworkUtils::ToNetworkOrder(ranges_size);
-	buffer.resize(offset + sizeof(ranges_size));
-	memcpy(buffer.data() + offset, &ranges_size_network_order, sizeof(ranges_size));
-	offset += sizeof(ranges_size);
-
-	// sensor_msgs/msg/LaserScan ranges data
-	buffer.resize(offset + ranges_size * sizeof(float));
-	memcpy(buffer.data() + offset, lidarScanData.ranges.data(), ranges_size * sizeof(float));
-	offset += ranges_size * sizeof(float);
-
-	// sensor_msgs/msg/LaserScan intensities size
-	uint32_t intensities_size = lidarScanData.intensities.size();
-	uint32_t intensities_size_network_order = NetworkUtils::ToNetworkOrder(intensities_size);
-	buffer.resize(offset + sizeof(intensities_size));
-	memcpy(buffer.data() + offset, &intensities_size_network_order, sizeof(intensities_size));
-	offset += sizeof(intensities_size);
-
-	// sensor_msgs/msg/LaserScan intensities data
-	buffer.resize(offset + intensities_size * sizeof(float));
-	memcpy(buffer.data() + offset, lidarScanData.intensities.data(), intensities_size * sizeof(float));
-	offset += intensities_size * sizeof(float);
+	uint32_t intensities_size = NetworkUtils::ToNetworkOrder(static_cast<uint32_t>(lidarScanData.intensities.size()));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(&intensities_size), reinterpret_cast<const char *>(&intensities_size) + sizeof(intensities_size));
+	buffer.insert(buffer.end(), reinterpret_cast<const char *>(lidarScanData.intensities.data()), reinterpret_cast<const char *>(lidarScanData.intensities.data()) + lidarScanData.intensities.size() * sizeof(float));
 
 	return buffer;
 }

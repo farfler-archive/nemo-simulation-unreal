@@ -5,6 +5,7 @@
 #include "CameraSensor.h"
 #include "NetworkUtils.h"
 
+#define TARGET_FPS 100.0f
 #define WHEELCHAIR_SPEED 4.0f
 
 UWheelchairSimulator::UWheelchairSimulator()
@@ -29,8 +30,8 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Limit to maximum 30 fps
-	if (GetWorld()->GetTimeSeconds() - LatestUpdateTime < 1.0f / 30.0f) {
+	// Limit maximum fps
+	if (GetWorld()->GetTimeSeconds() - LatestUpdateTime < 1.0f / TARGET_FPS) {
 		return;
 	}
 
@@ -43,7 +44,9 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Front Right LIDAR scan data
 	if (NetworkStreamerFR.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FR"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
+		LidarScanData::LidarScanData ScanData = LidarFR->GetLidarScanData();
+		ScanData.frameId = "front_right_laser_frame";
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(ScanData);
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerFR.SendData(LidarScanPacket);
@@ -55,7 +58,9 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Front Left LIDAR scan data
 	if (NetworkStreamerFL.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_FL"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
+		LidarScanData::LidarScanData ScanData = LidarFR->GetLidarScanData();
+		ScanData.frameId = "front_left_laser_frame";
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(ScanData);
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerFL.SendData(LidarScanPacket);
@@ -67,7 +72,9 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Rear Right LIDAR scan data
 	if (NetworkStreamerRR.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RR"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
+		LidarScanData::LidarScanData ScanData = LidarFR->GetLidarScanData();
+		ScanData.frameId = "rear_right_laser_frame";
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(ScanData);
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerRR.SendData(LidarScanPacket);
@@ -79,7 +86,9 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Create and send Rear Left LIDAR scan data
 	if (NetworkStreamerRL.IsConnected()) {
 		ULidarSensor* LidarFR = SensorManager.GetLidarSensor(TEXT("LIDAR_RL"));
-		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(LidarFR->GetLidarScanData());
+		LidarScanData::LidarScanData ScanData = LidarFR->GetLidarScanData();
+		ScanData.frameId = "rear_left_laser_frame";
+		std::vector<uint8_t> LatestLidarScan = LidarScanData::SerializeLidarScanData(ScanData);
 		std::vector<uint8_t> LidarScanPacket = NetworkUtils::CreateDataPacketWithHeader(LatestLidarScan);
 
 		bool Result = NetworkStreamerRL.SendData(LidarScanPacket);
@@ -103,14 +112,14 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// Move actor forward by WHEELCHAIR_SPEED
 	FVector NewLocation = GetOwner()->GetActorLocation();
 	NewLocation += GetOwner()->GetActorForwardVector() * WHEELCHAIR_SPEED;
-	GetOwner()->SetActorLocation(NewLocation);
-	UE_LOG(LogTemp, Warning, TEXT("Actor location: %s"), *NewLocation.ToString());
+	// GetOwner()->SetActorLocation(NewLocation);
+	// UE_LOG(LogTemp, Warning, TEXT("Actor location: %s"), *NewLocation.ToString());
 
 	// Rotate actor by 1 degree
 	FRotator NewRotation = GetOwner()->GetActorRotation();
 	NewRotation.Yaw += 1.0f;
-	GetOwner()->SetActorRotation(NewRotation);
-	UE_LOG(LogTemp, Warning, TEXT("Actor rotation: %s"), *NewRotation.ToString());
+	// GetOwner()->SetActorRotation(NewRotation);
+	// UE_LOG(LogTemp, Warning, TEXT("Actor rotation: %s"), *NewRotation.ToString());
 
 	LatestUpdateTime = GetWorld()->GetTimeSeconds();
 }
