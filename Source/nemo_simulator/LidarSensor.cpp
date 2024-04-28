@@ -54,7 +54,7 @@ void ULidarSensor::UpdateLidarScan()
 		AngleInDegrees = 360.0f - AngleInDegrees; // Reverse the angle to match ROS's coordinate system
 		// Cast a ray and store the distance to the hit point
 		float RayDistance = CastLidarRay(SensorLocation, SensorRotation, AngleInDegrees);
-		ScanData.ranges[RayIndex] = RayDistance; // Store the distance in the ranges array
+		ScanData.ranges[RayIndex] = RayDistance / 100.0f; // Store the distance in the ranges array
 	}
 
 	// Update the latest Lidar scan data

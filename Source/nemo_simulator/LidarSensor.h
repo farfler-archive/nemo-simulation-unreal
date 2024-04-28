@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	float MinRange = 0.0f; // Minimum sensing range of the Lidar in units
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
-	int NumLidarRays = 50; // Number of rays to simulate Lidar scanning
+	int NumLidarRays = 5000; // Number of rays to simulate Lidar scanning
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
 	bool bDrawRay = false; // Whether to visualize the Lidar rays in the simulation environment
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lidar Sensor")
