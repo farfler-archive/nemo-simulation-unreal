@@ -16,10 +16,10 @@ UWheelchairSimulator::UWheelchairSimulator()
 void UWheelchairSimulator::BeginPlay()
 {
 	Super::BeginPlay();
-	NetworkStreamerFR.InitServer("192.168.100.81", 12345);
-	NetworkStreamerFL.InitServer("192.168.100.81", 12346);
-	NetworkStreamerRR.InitServer("192.168.100.81", 12347);
-	NetworkStreamerRL.InitServer("192.168.100.81", 12348);
+	NetworkStreamerFR.InitServer("192.168.100.81", 42071);
+	NetworkStreamerFL.InitServer("192.168.100.81", 42070);
+	NetworkStreamerRR.InitServer("192.168.100.81", 42073);
+	NetworkStreamerRL.InitServer("192.168.100.81", 42072);
 	NetworkStreamerCamera.InitServer("192.168.100.81", 12349);
 
 	// Register sensors to the sensor manager
@@ -132,7 +132,7 @@ void UWheelchairSimulator::SetupSensors()
 	for (AActor* ChildActor : ChildActors) {
 		if (ChildActor->GetName().StartsWith("BP_LIDAR")) {
 			ULidarSensor* Lidar = Cast<ULidarSensor>(ChildActor->GetComponentByClass(ULidarSensor::StaticClass()));
-			Lidar->NumLidarRays = 5000;
+			Lidar->NumLidarRays = 360; // Change the number of rays to 360
 			// Register LIDAR sensor
 			SensorManager.RegisterSensor(Lidar);
 		}
