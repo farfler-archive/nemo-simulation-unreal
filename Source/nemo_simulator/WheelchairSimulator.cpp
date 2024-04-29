@@ -21,6 +21,7 @@ void UWheelchairSimulator::BeginPlay()
 	NetworkStreamerRR.InitServer("192.168.100.81", 42073);
 	NetworkStreamerRL.InitServer("192.168.100.81", 42072);
 	NetworkStreamerCamera.InitServer("192.168.100.81", 12349);
+	NetworkStreamerVelocity.InitServer("192.168.100.81", 12345);
 
 	// Register sensors to the sensor manager
 	SetupSensors();
@@ -40,6 +41,7 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 	NetworkStreamerRR.ListenForConnection();
 	NetworkStreamerRL.ListenForConnection();
 	NetworkStreamerCamera.ListenForConnection();
+	NetworkStreamerVelocity.ListenForConnection();
 
 	// Create and send Front Right LIDAR scan data
 	if (NetworkStreamerFR.IsConnected()) {
@@ -109,17 +111,19 @@ void UWheelchairSimulator::TickComponent(float DeltaTime, ELevelTick TickType, F
 		}
 	}
 
-	// Move actor forward by WHEELCHAIR_SPEED
-	FVector NewLocation = GetOwner()->GetActorLocation();
-	NewLocation += GetOwner()->GetActorForwardVector() * WHEELCHAIR_SPEED;
-	// GetOwner()->SetActorLocation(NewLocation);
-	// UE_LOG(LogTemp, Warning, TEXT("Actor location: %s"), *NewLocation.ToString());
+	if (NetworkStreamerVelocity.IsConnected()) {
+		// Move actor forward by WHEELCHAIR_SPEED
+		FVector NewLocation = GetOwner()->GetActorLocation();
+		NewLocation += GetOwner()->GetActorForwardVector() * WHEELCHAIR_SPEED;
+		// GetOwner()->SetActorLocation(NewLocation);
+		// UE_LOG(LogTemp, Warning, TEXT("Actor location: %s"), *NewLocation.ToString());
 
-	// Rotate actor by 1 degree
-	FRotator NewRotation = GetOwner()->GetActorRotation();
-	NewRotation.Yaw += 1.0f;
-	// GetOwner()->SetActorRotation(NewRotation);
-	// UE_LOG(LogTemp, Warning, TEXT("Actor rotation: %s"), *NewRotation.ToString());
+		// Rotate actor by 1 degree
+		FRotator NewRotation = GetOwner()->GetActorRotation();
+		NewRotation.Yaw += 1.0f;
+		// GetOwner()->SetActorRotation(NewRotation);
+		// UE_LOG(LogTemp, Warning, TEXT("Actor rotation: %s"), *NewRotation.ToString());
+	}
 
 	LatestUpdateTime = GetWorld()->GetTimeSeconds();
 }

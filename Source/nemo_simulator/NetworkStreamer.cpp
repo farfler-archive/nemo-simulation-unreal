@@ -73,6 +73,28 @@ bool NetworkStreamer::SendData(const std::vector<uint8_t>& Data)
 	return ConnectionSocket->Send(Data.data(), Data.size(), Sent);
 }
 
+std::vector<uint8_t> NetworkStreamer::ReceiveData()
+{
+	std::vector<uint8_t> Data;
+
+	if (!ConnectionSocket)
+	{
+		return Data;
+	}
+
+	uint32 Size = 0;
+	if (!ConnectionSocket->HasPendingData(Size))
+	{
+		return Data;
+	}
+
+	Data.resize(Size);
+	int32 Received = 0;
+	ConnectionSocket->Recv(Data.data(), Data.size(), Received);
+
+	return Data;
+}
+
 void NetworkStreamer::CloseServer()
 {
 	CloseSocket(ServerSocket);

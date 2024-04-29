@@ -14,6 +14,7 @@ public:
 	bool InitServer(const FString& ServerIP, int32 ListenPort);
 	bool ListenForConnection();
 	bool SendData(const std::vector<uint8_t>& Data);
+	std::vector<uint8_t> ReceiveData();
 	void CloseServer();
 	bool IsConnected() const;
 

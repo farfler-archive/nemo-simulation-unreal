@@ -32,6 +32,9 @@ private:
 	NetworkStreamer NetworkStreamerRL;
 	NetworkStreamer NetworkStreamerCamera;
 
+	// Network streamer for receiving velocity commands
+	NetworkStreamer NetworkStreamerVelocity;
+
 	// Sensor manager
 	SensorManager SensorManager;
 
