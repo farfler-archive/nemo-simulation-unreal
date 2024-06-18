@@ -192,7 +192,7 @@ void UWheelchairSimulator::SetupSensors()
 		if (ChildActor->GetName().StartsWith("BP_LIDAR"))
 		{
 			ULidarSensor *Lidar = Cast<ULidarSensor>(ChildActor->GetComponentByClass(ULidarSensor::StaticClass()));
-			Lidar->NumLidarRays = 360; // Change the number of rays to 360
+			// Lidar->NumLidarRays = 360; // Change the number of rays to 360
 			// Register LIDAR sensor
 			SensorManager.RegisterSensor(Lidar);
 		}
